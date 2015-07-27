@@ -10,6 +10,7 @@
 #include <vector>
 #include "ofMain.h"
 #include "Line.h"
+#include "Intersector.h"
 
 class FaceFinder
 {

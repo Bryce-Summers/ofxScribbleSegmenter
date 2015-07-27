@@ -30,6 +30,6 @@ class ofApp : public ofBaseApp{
 
         ofMutex mutex;
 
-        int num = 0;
+        int num;
 
 };

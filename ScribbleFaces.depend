@@ -1478,26 +1478,27 @@
 	"ofCamera.h"
 	"ofEvents.h"
 
-1436985123 c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\scribblefaces\src\ofapp.h
+1437701216 c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\scribblefaces\src\ofapp.h
 	"ofMain.h"
 	"../include/FaceFinder.h"
 
-1436991057 source:c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\scribblefaces\src\ofapp.cpp
+1437759400 source:c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\scribblefaces\src\ofapp.cpp
 	"ofApp.h"
 
-1436991012 source:c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\scribblefaces\src\facefinder.cpp
+1437763460 source:c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\scribblefaces\src\facefinder.cpp
 	"../include/FaceFinder.h"
 
-1436904145 c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\scribblefaces\include\facefinder.h
+1437694888 c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\scribblefaces\include\facefinder.h
 	<vector>
 	"ofMain.h"
 	"Line.h"
+	"Intersector.h"
 
-1436894822 c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\scribblefaces\include\line.h
+1437766861 c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\scribblefaces\include\line.h
 	<vector>
 	"ofMain.h"
 
-1436991033 source:c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\scribblefaces\src\line.cpp
+1437767290 source:c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\scribblefaces\src\line.cpp
 	"../include/Line.h"
 
 1435353896 source:c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\scribblefaces\src\lineintersector.cpp
@@ -1505,4 +1506,29 @@
 
 1435607372 c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\scribblefaces\include\lineintersector.h
 	"ofMain.h"
+
+1437681524 c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\scribblefaces\include\ofxsweepline.h
+	"ofMain.h"
+	<math.h>
+	<list>
+	<set>
+	<map>
+	"Line.h"
+
+1437683001 source:c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\scribblefaces\src\ofxsweepline.cpp
+	<iostream>
+	<math.h>
+	"../include/ofxSweepLine.h"
+
+1437771850 c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\scribblefaces\include\intersector.h
+	"ofMain.h"
+	<math.h>
+	<list>
+	<set>
+	"Line.h"
+
+1437772968 source:c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\scribblefaces\src\intersector.cpp
+	<iostream>
+	<math.h>
+	"../include/Intersector.h"
 

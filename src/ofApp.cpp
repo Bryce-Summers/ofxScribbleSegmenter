@@ -3,6 +3,7 @@
 //--------------------------------------------------------------
 void ofApp::setup(){
 
+    num = 0;
 
     /*
     points->push_back(ofPoint(0, 0));
@@ -13,6 +14,7 @@ void ofApp::setup(){
     points->push_back(ofPoint(0, 1));
     */
 
+    /*
     points.push_back(ofPoint(0, 100));
     points.push_back(ofPoint(200, 100));
     points.push_back(ofPoint(200, 200));
@@ -21,12 +23,22 @@ void ofApp::setup(){
     points.push_back(ofPoint(300, 0));
     points.push_back(ofPoint(300, 150));
     points.push_back(ofPoint(0, 150));
+    */
+
+    points.push_back(ofPoint(0, 100));
+    points.push_back(ofPoint(200, 100));
+    points.push_back(ofPoint(200, 50));
+    points.push_back(ofPoint(100, 50));
+    points.push_back(ofPoint(100, 150));
 
     std::vector< std::vector<ofPoint> *> * faces;
 
     shapes = segmenter.FindFaces(&points);
     cout << "setup done!" << endl;
     cout << shapes->size() << " Cycles!" << endl;
+
+
+
 
 }
 

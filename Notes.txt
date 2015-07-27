@@ -1,0 +1,14 @@
+I am going to optimize the intersection part of the algorithm using the
+
+Bentley–Ottmann algorithm
+
+I will need to get a binary search tree up and running.
+I will also need to get a min Heap up an running.
+
+
+Currently the code is infinitly looping is some part. It is probably generating too many intersection events.
+
+
+I conjecture that the infinite looping is due to the generation of too many intersection events.
+
+It turns out that the problem might lie somewhere in the deallocation of the Event Queue.

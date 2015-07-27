@@ -10,10 +10,12 @@ Line::Line(int start_point, int end_point, std::vector<ofPoint> * points_global)
     // The indices point to points within this global array.
     points = points_global;
 
-    p1 = points->at(p1_index);
-    p2 = points->at(p2_index);
+    p1 = points -> at(p1_index);
+    p2 = points -> at(p2_index);
 
     offset = p2 - p1;
+
+    latest_intersection_index = -1;
 }
 
 Line::~Line()
@@ -22,20 +24,29 @@ Line::~Line()
 }
 
 // Returns true iff the lines intersect, if they are not already connected at endpoints a split point is created.
+// Intersections at end points --> a false return;
 bool Line::intersect(Line * other)
 {
-    // Already Previously Connected.
-    if(p1_index == other -> p1_index || p1_index == other->p2_index ||
-       p2_index == other -> p1_index || p2_index == other->p2_index)
+    std::map<scrib::Line *, bool>::iterator iter;
+    iter = intersection_predicate.find(other);
+    if (iter != intersection_predicate.end())
     {
-        return true;
+        return iter -> second;
     }
 
-    float a1 = line_side_test(other->p1);
-    float a2 = line_side_test(other->p2);
 
-    float b1 = other->line_side_test(p1);
-    float b2 = other->line_side_test(p2);
+    // Already Previously Connected.
+    if(p1_index == other -> p1_index || p1_index == other -> p2_index ||
+       p2_index == other -> p1_index || p2_index == other -> p2_index)
+    {
+        return false;
+    }
+
+    float a1 = line_side_test(other -> p1);
+    float a2 = line_side_test(other -> p2);
+
+    float b1 = other -> line_side_test(p1);
+    float b2 = other -> line_side_test(p2);
 
     /* The product of two point based line side tests will be negative iff
      * the points are not on strictly opposite sides of the line.
@@ -43,11 +54,13 @@ bool Line::intersect(Line * other)
      */
     bool result = a1*a2 <= 0 && b1*b2 <= 0;
 
+    intersection_predicate[other] = result;
+    other->intersection_predicate[this] = result;
+
     if(!result)
     {
         return false;
     }
-
 
     // Find the intersection point.
 
@@ -183,5 +196,9 @@ void Line::sort_sub_points()
 
 }
 
+ofPoint Line::getLatestIntersectionPoint()
+{
+    return points -> at(points -> size() - 1);
+}
 
 }

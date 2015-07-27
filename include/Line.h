@@ -25,6 +25,9 @@ class Line
          */
         bool intersect(Line * other);
 
+        // Simply returns whether this line intersects the other line.
+        bool intersectPredicate(Line * other);
+
         // Returns a signed floating point number indicating which direction the given point is relative to this line.
         float line_side_test(ofPoint p);
 
@@ -32,10 +35,8 @@ class Line
         // Adds itself if it does not contain any split lines.
         void getSplitLines(std::vector<Line *> * lines_collector);
 
-        //std::vector<ofPoint *> getSplitPoints
-
-        // The canonical array of points.
-        std::vector<ofPoint> * points;
+        // This function should only be called after a call to intersect has returned true.
+        ofPoint getLatestIntersectionPoint();
 
         // Point indices.
         int p1_index;
@@ -48,18 +49,25 @@ class Line
         // The offset between the two points.
         ofPoint offset;
 
+
+    protected:
+    private:
+
+        // The canonical array of points.
+        std::vector<ofPoint> * points;
         // Collection of doubles representing the percentage a point is between p1 and p2.
         std::vector<float> split_points_per;
         // The indices of the points.
         std::vector<int> split_points_indices;
 
-    protected:
-    private:
-
         void sort_sub_points();
 
 
+        // Contains a valid result of the latest intersection point that
+        // caused intersect to return true.
+        int latest_intersection_index;
 
+        map<scrib::Line *, bool> intersection_predicate;
 };
 
 }

@@ -13,10 +13,15 @@ FaceFinder::~FaceFinder()
 
 std::vector< std::vector<ofPoint> *> * FaceFinder::FindFaces(std::vector<ofPoint> * inputs)
 {
+    cout << "**Loading Input" << endl;
     loadInput(inputs);
+    cout << "**Splitting Lines" << endl;
     splitIntersectionPoints();
+    cout << "**Converting to Directed Graph." << endl;
     convert_to_directedGraph();
+    cout << "**Sorting by Edge Angle." << endl;
     sort_graph_by_edge_angle();
+    cout << "**Deriving Faces." << endl;
     std::vector< std::vector<ofPoint> *> * output = deriveFaces();
 
     cleanup();
@@ -49,18 +54,29 @@ void FaceFinder::loadInput(std::vector<ofPoint> * inputs)
 
 void FaceFinder::splitIntersectionPoints()
 {
+
+    // Use an (|lines| + |intersections|)*log(|lines|) algorithm.
+    // Bentley–Ottmann
+    scrib::Intersector intersector;
+    intersector.intersect(lines_initial);
+
+    cout << "Face-Finder : Done performing intersections." << endl;
+
     int numLines = lines_initial->size();
+    /* N^2 Naive Intersection Algorithm.
 
     // -- Intersect all of the lines.
     for(int a = 0; a < numLines; a++)
     for(int b = a + 1; b < numLines; b++)
     {
-        scrib::Line * l1 = lines_initial->at(a);
-        scrib::Line * l2 = lines_initial->at(b);
+        scrib::Line * l1 = lines_initial -> at(a);
+        scrib::Line * l2 = lines_initial -> at(b);
 
         // Intersects the points and updates the line's internal split data.
-        l1->intersect(l2);
+        l1 -> intersect(l2);
     }
+
+    */
 
     // Populate the split sequence of lines.
     lines_split = new std::vector<scrib::Line*>();
@@ -70,6 +86,8 @@ void FaceFinder::splitIntersectionPoints()
         scrib::Line * line = lines_initial->at(i);
         line->getSplitLines(lines_split);
     }
+
+    cout << "Face-Finder : Done Splitting Lines." << endl;
 }
 
 void FaceFinder::convert_to_directedGraph()
