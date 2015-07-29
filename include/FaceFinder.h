@@ -15,7 +15,7 @@
 class FaceFinder
 {
     public:
-        FaceFinder(){};
+        FaceFinder(bool useBentleyOttman){bUseBentleyOttman = useBentleyOttman;};
         virtual ~FaceFinder(){};
 
         std::vector< std::vector<ofPoint> *> * FindFaces(std::vector<ofPoint> * inputs);
@@ -23,6 +23,8 @@ class FaceFinder
 
     protected:
     private:
+
+        bool bUseBentleyOttman;
 
         // Initializes the original lines from the input points.
         // Starts up the indexed collection of points.

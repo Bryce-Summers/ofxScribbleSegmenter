@@ -26,7 +26,8 @@ class ofApp : public ofBaseApp{
 
         std::vector< std::vector<ofPoint> *> * shapes;
 
-        FaceFinder segmenter;
+        FaceFinder segmenter_bentley = FaceFinder(true);
+        FaceFinder segmenter_brute = FaceFinder(false);
 
         ofMutex mutex;
 

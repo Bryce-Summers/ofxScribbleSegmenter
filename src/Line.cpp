@@ -36,6 +36,7 @@ bool Line::intersect(Line * other)
 
 
     // Already Previously Connected.
+    // Connected at a joint in the input polyline.
     if(p1_index == other -> p1_index || p1_index == other -> p2_index ||
        p2_index == other -> p1_index || p2_index == other -> p2_index)
     {
@@ -89,7 +90,7 @@ bool Line::intersect(Line * other)
     float v = (dy * ad.x - dx * ad.y) / det;
 
     split_points_per.push_back(u);
-    other->split_points_per.push_back(v);
+    other -> split_points_per.push_back(v);
 
     ofPoint intersection_point = as + ad*u;
 

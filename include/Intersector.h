@@ -72,7 +72,7 @@ struct LineTupleCompare
         }
 
         // We want lines with greater slop to be higher in the bst.
-        return (e1 -> slope) > (e2 -> slope);
+        return (e1 -> slope) < (e2 -> slope);
     }
 };
 
@@ -138,7 +138,7 @@ class EventPQ
 
                 if(e1.x < e2.x){return true;}
                 if(e2.x < e1.x){return false;}
-                if(e1.y < e2.y){return true;}
+                if(e1.y > e2.y){return true;}
                 if(e2.y < e1.y){return false;}
 
                 if((e1.type == Event::EXIT) && (e2.type == Event::ENTER))
@@ -146,7 +146,17 @@ class EventPQ
                     return true;
                 }
 
+                if((e1.type == Event::ENTER) && (e2.type == Event::EXIT))
+                {
+                    return false;
+                }
+
                 if((e1.tuple1->slope) > (e2.tuple1->slope))
+                {
+                    return true;
+                }
+
+                if((e1.tuple1->slope) < (e2.tuple1->slope))
                 {
                     return true;
                 }

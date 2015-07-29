@@ -5,40 +5,22 @@ void ofApp::setup(){
 
     num = 0;
 
-    /*
-    points->push_back(ofPoint(0, 0));
-    points->push_back(ofPoint(1, 0));
-    points->push_back(ofPoint(1, 1));
-    points->push_back(ofPoint(.5, 1));
-    points->push_back(ofPoint(.5, -1));
-    points->push_back(ofPoint(0, 1));
-    */
 
-    /*
-    points.push_back(ofPoint(0, 100));
-    points.push_back(ofPoint(200, 100));
-    points.push_back(ofPoint(200, 200));
-    points.push_back(ofPoint(100, 200));
-    points.push_back(ofPoint(100, 0));
-    points.push_back(ofPoint(300, 0));
-    points.push_back(ofPoint(300, 150));
-    points.push_back(ofPoint(0, 150));
-    */
+    points.push_back(ofPoint(20, 0));//0
+    points.push_back(ofPoint(90, 100));//0
+    points.push_back(ofPoint(90, 0));//2
+    points.push_back(ofPoint(10, 100));//3
+    points.push_back(ofPoint(50, 0));//4
+    points.push_back(ofPoint(100, 80));//5
+    points.push_back(ofPoint(0, 80));//6
 
-    points.push_back(ofPoint(0, 100));
-    points.push_back(ofPoint(200, 100));
-    points.push_back(ofPoint(200, 50));
-    points.push_back(ofPoint(100, 50));
-    points.push_back(ofPoint(100, 150));
 
     std::vector< std::vector<ofPoint> *> * faces;
 
-    shapes = segmenter.FindFaces(&points);
+    shapes = segmenter_bentley.FindFaces(&points);
+    shapes = segmenter_brute.FindFaces(&points);
     cout << "setup done!" << endl;
     cout << shapes->size() << " Cycles!" << endl;
-
-
-
 
 }
 
@@ -76,7 +58,7 @@ void ofApp::draw(){
 
         ofPath p = ofPath();
         p.setStrokeColor(128);
-        p.setStrokeWidth(1);
+        p.setStrokeWidth(5);
 
         ofPoint pt = points -> at(0);
         p.moveTo(pt.x, pt.y);
@@ -156,13 +138,15 @@ void ofApp::mousePressed(int x, int y, int button){
 void ofApp::mouseReleased(int x, int y, int button)
 {
 
-    std::vector< std::vector<ofPoint> *> * shapes_new = segmenter.FindFaces(&points);
+    std::vector< std::vector<ofPoint> *> * shapes_new  = segmenter_bentley.FindFaces(&points);
+    std::vector< std::vector<ofPoint> *> * shapes_new2 = segmenter_brute.FindFaces(&points);
 
     mutex.lock();
     shapes = shapes_new;
     mutex.unlock();
 
     cout<< "Rebuilt Scribble" << endl;
+    cout << shapes_new2->size() << " Brute Cycles!" << endl;
     cout << shapes->size() << " Cycles!" << endl;
 
     num = 0;

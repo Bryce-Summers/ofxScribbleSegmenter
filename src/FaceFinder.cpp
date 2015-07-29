@@ -14,9 +14,23 @@ FaceFinder::~FaceFinder()
 std::vector< std::vector<ofPoint> *> * FaceFinder::FindFaces(std::vector<ofPoint> * inputs)
 {
     cout << "**Loading Input" << endl;
+
     loadInput(inputs);
+
     cout << "**Splitting Lines" << endl;
+    long t0 = ofGetElapsedTimeMicros();
     splitIntersectionPoints();
+    long t1 = ofGetElapsedTimeMicros();
+
+    if(bUseBentleyOttman)
+    {
+        printf ("Bentley : %6d \n ", (int)(t1 - t0));
+    }
+    else
+    {
+        printf ("Brute Force : %6d: \n", (int)(t1 - t0));
+    }
+
     cout << "**Converting to Directed Graph." << endl;
     convert_to_directedGraph();
     cout << "**Sorting by Edge Angle." << endl;
@@ -39,7 +53,9 @@ void FaceFinder::loadInput(std::vector<ofPoint> * inputs)
 
     for(int i = 0; i < len; i++)
     {
-        points -> push_back(inputs->at(i) + ofPoint(ofRandomf(), ofRandomf()));
+        ofPoint input_point = inputs -> at(i) + ofPoint(ofRandomf(), ofRandomf());
+        points -> push_back(input_point);
+        //cout << input_point << endl;
     }
 
     // Populate the original lines.
@@ -57,26 +73,33 @@ void FaceFinder::splitIntersectionPoints()
 
     // Use an (|lines| + |intersections|)*log(|lines|) algorithm.
     // Bentley–Ottmann
-    scrib::Intersector intersector;
-    intersector.intersect(lines_initial);
-
-    cout << "Face-Finder : Done performing intersections." << endl;
-
-    int numLines = lines_initial->size();
-    /* N^2 Naive Intersection Algorithm.
-
-    // -- Intersect all of the lines.
-    for(int a = 0; a < numLines; a++)
-    for(int b = a + 1; b < numLines; b++)
+    if(bUseBentleyOttman)
     {
-        scrib::Line * l1 = lines_initial -> at(a);
-        scrib::Line * l2 = lines_initial -> at(b);
-
-        // Intersects the points and updates the line's internal split data.
-        l1 -> intersect(l2);
+        scrib::Intersector intersector;
+        intersector.intersect(lines_initial);
+        //cout << "Face-Finder : Done performing Bentley Ottman intersections." << endl;
     }
 
-    */
+    int numLines = lines_initial->size();
+
+    // N^2 Naive Intersection Algorithm.
+
+    if(!bUseBentleyOttman)
+    {
+        // -- Intersect all of the lines.
+        for(int a = 0; a < numLines; a++)
+        for(int b = a + 1; b < numLines; b++)
+        {
+            scrib::Line * l1 = lines_initial -> at(a);
+            scrib::Line * l2 = lines_initial -> at(b);
+
+            // Intersects the points and updates the line's internal split data.
+            l1 -> intersect(l2);
+        }
+
+        //cout << "Face-Finder : Done performing Brute Force intersections." << endl;
+    }
+
 
     // Populate the split sequence of lines.
     lines_split = new std::vector<scrib::Line*>();
@@ -87,7 +110,7 @@ void FaceFinder::splitIntersectionPoints()
         line->getSplitLines(lines_split);
     }
 
-    cout << "Face-Finder : Done Splitting Lines." << endl;
+    //cout << "Face-Finder : Done Splitting Lines." << endl;
 }
 
 void FaceFinder::convert_to_directedGraph()

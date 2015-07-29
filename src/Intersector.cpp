@@ -32,19 +32,20 @@ void Intersector::intersect(std::vector<scrib::Line*> * lines)
         switch(event.type)
         {
             case Event::ENTER:
-
-                std::cout << "ENTER Event" << endl;
+                //std::cout << "ENTER Event :" << event.tuple1->line->p1_index << "; " << event.tuple1->line->p2_index << endl;
 
                 tuple_bst.addTuple(event.tuple1, &above, &below);
 
                 if(above != NULL)
                 {
-                    neighbor_event(above, event.tuple1, event_queue);
+                    //cout << "--Above : " << above -> line -> p1_index << "; " << above -> line -> p2_index << endl;
+                    //neighbor_event(above, event.tuple1, event_queue);
                 }
 
                 if(below != NULL)
                 {
-                    neighbor_event(below, event.tuple1, event_queue);
+                    //cout << "--Below : " << below -> line -> p1_index << "; " << below -> line -> p2_index << endl;
+                    //neighbor_event(below, event.tuple1, event_queue);
                 }
 
 
@@ -52,13 +53,15 @@ void Intersector::intersect(std::vector<scrib::Line*> * lines)
 
             case Event::EXIT:
 
-                std::cout << "EXIT Event" << endl;
+                //std::cout << "EXIT Event" << event.tuple1->line->p1_index << "; " << event.tuple1->line->p2_index << endl;
 
                 tuple_bst.removeTuple(event.tuple1, &above, &below);
 
                 if(above != NULL && below != NULL)
                 {
-                    neighbor_event(above, below, event_queue);
+                    //cout << "--Above : " << above -> line -> p1_index << "; " << above -> line -> p2_index << endl;
+                    //cout << "--Below : " << below -> line -> p1_index << "; " << below -> line -> p2_index << endl;
+                    //neighbor_event(above, below, event_queue);
                 }
 
                 // Conserve the Memory.
@@ -68,8 +71,9 @@ void Intersector::intersect(std::vector<scrib::Line*> * lines)
 
             case Event::INTERSECTION:
 
-                std::cout << "Intersection Event" << endl;
-                cout << event.tuple1 << " " << event.tuple2 << endl;
+                //std::cout << "Intersection Event" << event.tuple1->line->p1_index << ", " << event.tuple1->line->p2_index <<
+                //" and " << event.tuple2->line->p1_index << ", " << event.tuple2->line->p2_index << endl;
+                //cout << event.tuple1 << " " << event.tuple2 << endl;
 
                 if(check_repeat_event(event.tuple1, event.tuple2, intersection_events))
                 {
@@ -90,16 +94,16 @@ void Intersector::intersect(std::vector<scrib::Line*> * lines)
 
                 if(above != NULL)
                 {
-                    event_queue.removeIntersectionEvent(above, event.tuple2);
+                    //event_queue.removeIntersectionEvent(above, event.tuple2);
                     neighbor_event(above, event.tuple1, event_queue);
-                    //neighbor_event(above, event.tuple2, event_queue);
+                    neighbor_event(above, event.tuple2, event_queue);
                 }
 
                 if(below != NULL)
                 {
-                    event_queue.removeIntersectionEvent(below, event.tuple1);
+                    //event_queue.removeIntersectionEvent(below, event.tuple1);
                     neighbor_event(below, event.tuple2, event_queue);
-                    //neighbor_event(below, event.tuple1, event_queue);
+                    neighbor_event(below, event.tuple1, event_queue);
                 }
 
                 tuple_bst.addTuple(event.tuple1, &above, &below);
@@ -158,6 +162,28 @@ void Intersector::swap_tuples(LineTuple * tuple1, LineTuple * tuple2, float x, f
     tuple1 -> y = y;
     tuple2 -> x = x;
     tuple2 -> y = y;
+
+/*
+    if(tuple1->slope > 0)
+    {
+        tuple1->y += .00001;
+    }
+    else if(tuple1 -> slope < 0)
+    {
+        tuple1 -> y -= .00001;
+    }
+
+    if(tuple2->slope > 0)
+    {
+        tuple2->y += .00001;
+    }
+    else if(tuple2 -> slope < 0)
+    {
+        tuple2 -> y -= .00001;
+    }
+    */
+
+
 
     // We want these lineTuples to remain in the same part of memory,
     // so that they may be found in the Binary Search Tree.
@@ -311,7 +337,30 @@ void TupleBST::addTuple(LineTuple * line_tuple, LineTuple ** above, LineTuple **
     *above = NULL;
     *below = NULL;
 
+
+    /***********************************************************
+     * HACK, HACK, HACK, HACK, HACK, HACK, HACK!!!!
+     * Horrible HACK that invalidates the point of implementing
+     * the Bentley Ottman Algorithm.
+     ***********************************************************/
+
+    // FIXME : Remove this hack
+    set<LineTuple *>::iterator hack_iter = bst.begin();
+
+    while(hack_iter != bst.end())
+    {
+        line_tuple->line->intersect((*hack_iter)->line);
+        hack_iter++;
+    }
+
+    /**
+     * END of HACK.
+     */
+
     pair<set<LineTuple *>::iterator, bool> insert_result = bst.insert(line_tuple);
+
+    /** HACK **/
+    return;
 
     //cout << "--Tuple Added: " << line_tuple->x << " " << line_tuple->y << " " << line_tuple->slope << endl;
 
@@ -321,13 +370,32 @@ void TupleBST::addTuple(LineTuple * line_tuple, LineTuple ** above, LineTuple **
     {
         iter--;// Move iterator backwards.
         *above = *iter;
+
+
+        if(iter != bst.begin() && (*above) -> y == line_tuple -> y)
+        {
+            iter--;
+            *above= *iter;
+            iter++;
+        }
+
+
         iter++;
     }
+
 
     iter++;
     if(iter != bst.end())
     {
         *below = *iter;
+
+
+        iter++;
+        if(iter != bst.end() && (*below) -> y == line_tuple -> y)
+        {
+            *below = *iter;
+        }
+
     }
 
 }
