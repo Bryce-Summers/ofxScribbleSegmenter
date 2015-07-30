@@ -1482,23 +1482,23 @@
 	"ofMain.h"
 	"../include/FaceFinder.h"
 
-1438196977 source:c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\scribblefaces\src\ofapp.cpp
+1438234230 source:c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\scribblefaces\src\ofapp.cpp
 	"ofApp.h"
 
-1438212622 source:c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\scribblefaces\src\facefinder.cpp
+1438237552 source:c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\scribblefaces\src\facefinder.cpp
 	"../include/FaceFinder.h"
 
-1438196668 c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\scribblefaces\include\facefinder.h
+1438238915 c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\scribblefaces\include\facefinder.h
 	<vector>
 	"ofMain.h"
 	"Line.h"
 	"Intersector.h"
 
-1437766861 c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\scribblefaces\include\line.h
+1438237460 c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\scribblefaces\include\line.h
 	<vector>
 	"ofMain.h"
 
-1438104215 source:c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\scribblefaces\src\line.cpp
+1438237475 source:c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\scribblefaces\src\line.cpp
 	"../include/Line.h"
 
 1435353896 source:c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\scribblefaces\src\lineintersector.cpp
@@ -1520,14 +1520,14 @@
 	<math.h>
 	"../include/ofxSweepLine.h"
 
-1438192391 c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\scribblefaces\include\intersector.h
+1438236261 c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\scribblefaces\include\intersector.h
 	"ofMain.h"
 	<math.h>
 	<list>
 	<set>
 	"Line.h"
 
-1438211995 source:c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\scribblefaces\src\intersector.cpp
+1438238422 source:c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\scribblefaces\src\intersector.cpp
 	<iostream>
 	<math.h>
 	"../include/Intersector.h"

@@ -120,7 +120,6 @@
 		<Unit filename="icon.rc">
 			<Option compilerVar="WINDRES" />
 		</Unit>
-		<Unit filename="include/ofxSweepLine.h" />
 		<Unit filename="src/FaceFinder.cpp" />
 		<Unit filename="src/Intersector.cpp" />
 		<Unit filename="src/Line.cpp" />
@@ -132,9 +131,6 @@
 		</Unit>
 		<Unit filename="src/ofApp.h">
 			<Option virtualFolder="src" />
-		</Unit>
-		<Unit filename="src/ofxSweepLine.cpp">
-			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
 		<Extensions>
 			<code_completion />

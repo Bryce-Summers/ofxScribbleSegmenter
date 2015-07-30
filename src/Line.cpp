@@ -14,8 +14,6 @@ Line::Line(int start_point, int end_point, std::vector<ofPoint> * points_global)
     p2 = points -> at(p2_index);
 
     offset = p2 - p1;
-
-    latest_intersection_index = -1;
 }
 
 Line::~Line()
@@ -27,13 +25,6 @@ Line::~Line()
 // Intersections at end points --> a false return;
 bool Line::intersect(Line * other)
 {
-    std::map<scrib::Line *, bool>::iterator iter;
-    iter = intersection_predicate.find(other);
-    if (iter != intersection_predicate.end())
-    {
-        return iter -> second;
-    }
-
 
     // Already Previously Connected.
     // Connected at a joint in the input polyline.
@@ -54,9 +45,6 @@ bool Line::intersect(Line * other)
      * If the product is 0, then at least one of the points is on the line not containing the points.
      */
     bool result = a1*a2 <= 0 && b1*b2 <= 0;
-
-    intersection_predicate[other] = result;
-    other->intersection_predicate[this] = result;
 
     if(!result)
     {
@@ -123,7 +111,7 @@ bool isLeft(Point a, Point b, Point c){
 
 // Appends all of the lines that are used to subdivide this one,
 // complete with proper and consistent indices into the global array.
-void Line::getSplitLines(std::vector<Line *> * lines_collector)
+void Line::getSplitLines(std::vector<Line> * lines_collector)
 {
     // Number of split points.
     int len = split_points_per.size();
@@ -132,7 +120,7 @@ void Line::getSplitLines(std::vector<Line *> * lines_collector)
     if(len == 0)
     {
         // Saves work.
-        lines_collector->push_back(this);
+        lines_collector->push_back(*this);
         return;
     }
 
@@ -147,17 +135,17 @@ void Line::getSplitLines(std::vector<Line *> * lines_collector)
     int last_indice = split_points_indices[0];
 
     // The initial line.
-    lines_collector->push_back(new scrib::Line(p1_index, last_indice, points));
+    lines_collector->push_back(scrib::Line(p1_index, last_indice, points));
 
     for(int i = 1; i < len; i++)
     {
         int next_indice = split_points_indices[i];
-        lines_collector->push_back(new scrib::Line(last_indice, next_indice, points));
+        lines_collector->push_back(scrib::Line(last_indice, next_indice, points));
         last_indice = next_indice;
     }
 
     // The last line.
-    lines_collector -> push_back(new scrib::Line(last_indice, p2_index, points));
+    lines_collector -> push_back(scrib::Line(last_indice, p2_index, points));
 
     // Done.
     return;

@@ -147,7 +147,8 @@ void ofApp::mouseReleased(int x, int y, int button)
 
     cout<< "Rebuilt Scribble" << endl;
     cout << shapes_new2->size() << " Brute Cycles!" << endl;
-    cout << shapes->size() << " Cycles!" << endl;
+    cout << shapes->size() << " Bentley Cycles!" << endl;
+    cout << "Size = " << points.size() << endl;
 
     num = 0;
 }

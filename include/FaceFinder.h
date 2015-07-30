@@ -15,7 +15,7 @@
 class FaceFinder
 {
     public:
-        FaceFinder(bool useBentleyOttman){bUseBentleyOttman = useBentleyOttman;};
+        FaceFinder(bool useBentleyOttman = true){bUseBentleyOttman = useBentleyOttman;};
         virtual ~FaceFinder(){};
 
         std::vector< std::vector<ofPoint> *> * FindFaces(std::vector<ofPoint> * inputs);
@@ -76,12 +76,12 @@ class FaceFinder
         // -- Data Structures.
 
         // The canonical collection of points at their proper indices.
-        std::vector<ofPoint> * points;
+        std::vector<ofPoint> points;
 
         // The original input lines.
-        std::vector<scrib::Line*> * lines_initial;
+        std::vector<scrib::Line> lines_initial;
         // Split version of original input lines, where lines only intersect at vertices.
-        std::vector<scrib::Line *> * lines_split;
+        std::vector<scrib::Line> lines_split;
 
         // The directed graph that represents edges between points.
         // Each of the integers represents an index into the points array.

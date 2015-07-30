@@ -13,32 +13,34 @@ FaceFinder::~FaceFinder()
 
 std::vector< std::vector<ofPoint> *> * FaceFinder::FindFaces(std::vector<ofPoint> * inputs)
 {
-    cout << "**Loading Input" << endl;
-
+    long t0 = ofGetElapsedTimeMicros();
     loadInput(inputs);
 
-    cout << "**Splitting Lines" << endl;
-    long t0 = ofGetElapsedTimeMicros();
-    splitIntersectionPoints();
     long t1 = ofGetElapsedTimeMicros();
+    splitIntersectionPoints();
+    long t2 = ofGetElapsedTimeMicros();
+
+    convert_to_directedGraph();
+    long t3 = ofGetElapsedTimeMicros();
+    sort_graph_by_edge_angle();
+
+    long t4 = ofGetElapsedTimeMicros();
+    std::vector< std::vector<ofPoint> *> * output = deriveFaces();
+    long t5 = ofGetElapsedTimeMicros();
+
+    cleanup();
+    long t6 = ofGetElapsedTimeMicros();
 
     if(bUseBentleyOttman)
     {
-        printf ("Bentley : %6d \n ", (int)(t1 - t0));
+        printf ("Bentley : %6d, %6d, %6d, %6d, %6d, %6d, total : %6d \n ", (int)(t1 - t0)/1000,
+                (int)(t2 - t1)/1000, (int)(t3 - t2)/1000, (int)(t4 - t3)/1000, (int)(t5 - t4)/1000, (int)(t6 - t5)/1000, (int)(t6 - t0));
     }
     else
     {
-        printf ("Brute Force : %6d: \n", (int)(t1 - t0));
+        printf ("Brute Force :  %6d, %6d, %6d, %6d, %6d, %6d, total : %6d \n ", (int)(t1 - t0)/1000,
+                (int)(t2 - t1)/1000, (int)(t3 - t2)/1000, (int)(t4 - t3)/1000, (int)(t5 - t4)/1000, (int)(t6 - t5)/1000, (int)(t6 - t0));
     }
-
-    cout << "**Converting to Directed Graph." << endl;
-    convert_to_directedGraph();
-    cout << "**Sorting by Edge Angle." << endl;
-    sort_graph_by_edge_angle();
-    cout << "**Deriving Faces." << endl;
-    std::vector< std::vector<ofPoint> *> * output = deriveFaces();
-
-    cleanup();
 
     return output;
 }
@@ -47,23 +49,23 @@ void FaceFinder::loadInput(std::vector<ofPoint> * inputs)
 {
 
     // Populate the original points.
-    points = new std::vector<ofPoint>();
+    points.clear();
 
     int len = inputs->size();
 
     for(int i = 0; i < len; i++)
     {
         ofPoint input_point = inputs -> at(i) + ofPoint(ofRandomf(), ofRandomf());
-        points -> push_back(input_point);
+        points.push_back(input_point);
         //cout << input_point << endl;
     }
 
     // Populate the original lines.
-    lines_initial = new std::vector<scrib::Line*>();
+    lines_initial.clear();
 
     for(int i = 0; i < len - 1; i++)
     {
-        lines_initial -> push_back(new scrib::Line(i, i + 1, points));
+        lines_initial.push_back(scrib::Line(i, i + 1, &points));
     }
 
 }
@@ -76,11 +78,11 @@ void FaceFinder::splitIntersectionPoints()
     if(bUseBentleyOttman)
     {
         scrib::Intersector intersector;
-        intersector.intersect(lines_initial);
+        intersector.intersect(&lines_initial);
         //cout << "Face-Finder : Done performing Bentley Ottman intersections." << endl;
     }
 
-    int numLines = lines_initial->size();
+    int numLines = lines_initial.size();
 
     // N^2 Naive Intersection Algorithm.
 
@@ -90,11 +92,8 @@ void FaceFinder::splitIntersectionPoints()
         for(int a = 0; a < numLines; a++)
         for(int b = a + 1; b < numLines; b++)
         {
-            scrib::Line * l1 = lines_initial -> at(a);
-            scrib::Line * l2 = lines_initial -> at(b);
-
-            // Intersects the points and updates the line's internal split data.
-            l1 -> intersect(l2);
+            scrib::Line * line = &(lines_initial[b]);
+            lines_initial[a].intersect(line);
         }
 
         //cout << "Face-Finder : Done performing Brute Force intersections." << endl;
@@ -102,12 +101,12 @@ void FaceFinder::splitIntersectionPoints()
 
 
     // Populate the split sequence of lines.
-    lines_split = new std::vector<scrib::Line*>();
+    lines_split.clear();
 
     for(int i = 0; i < numLines; i++)
     {
-        scrib::Line * line = lines_initial->at(i);
-        line->getSplitLines(lines_split);
+        scrib::Line line = lines_initial[i];
+        line.getSplitLines(&lines_split);
     }
 
     //cout << "Face-Finder : Done Splitting Lines." << endl;
@@ -119,7 +118,7 @@ void FaceFinder::convert_to_directedGraph()
     //directed_graph   = new std::map<int, std::vector<int> *> ();
     //output_predicate = new std::map<int, std::vector<bool> *>();
 
-    int numPoints = points->size();
+    int numPoints = points.size();
     for(int i = 0; i < numPoints; i++)
     {
         directed_graph[i]   = new std::vector<int>();
@@ -127,10 +126,10 @@ void FaceFinder::convert_to_directedGraph()
     }
 
     // Add all of the lines to the directed graph structure.
-    int numLines = lines_split->size();
+    int numLines = lines_split.size();
     for(int i = 0; i < numLines; i++)
     {
-        scrib::Line * line = lines_split->at(i);
+        scrib::Line * line = &(lines_split[i]);
 
         int index_a = line->p1_index;
         int index_b = line->p2_index;
@@ -158,7 +157,7 @@ void FaceFinder::addDirectedEdge(int index_a, int index_b)
 void FaceFinder::sort_graph_by_edge_angle()
 {
     // Sort each outgoing edges list.
-    int numPoints = points->size();
+    int numPoints = points.size();
     for(int i = 0; i < numPoints; i++)
     {
 
@@ -173,13 +172,13 @@ void FaceFinder::sort_vertice_by_edge_angle(int center_point_index, std::vector<
     // Initialize useful information.
     int len = outgoing_indices->size();
     std::vector<float> angles;
-    ofPoint center = points->at(center_point_index);
+    ofPoint center = points[center_point_index];
 
     // Populate the angles array with absolute relative angles.
     for(int i = 0; i < len; i++)
     {
         int point_index = outgoing_indices->at(i);
-        ofPoint point   = points->at(point_index);
+        ofPoint point   = points[point_index];
 
         float angle     = atan2(point.y - center.y, point.x - center.x);
         angles.push_back(angle);
@@ -219,7 +218,7 @@ std::vector< std::vector<ofPoint> *> * FaceFinder::deriveFaces()
 
     // For all edges, output their cycle once.
 
-    int numPoints = points->size();
+    int numPoints = points.size();
 
     // Iterate through all originating points.
     for(int point_index = 0; point_index < numPoints; point_index++)
@@ -261,7 +260,7 @@ std::vector<ofPoint> * FaceFinder::getCycle(int p1_original, int p2_original, in
     do
     {
         setPredicate(i1, outgoing_index);
-        output -> push_back(points -> at(i2));
+        output->push_back(points[i2]);
         getNextEdge(&i1, &i2, &outgoing_index);
     }
     while(i1 != p1_original || i2 != p2_original);
@@ -323,15 +322,6 @@ int FaceFinder::find_outgoing_index_of_edge(int p1, int p2)
 void FaceFinder::cleanup()
 {
 
-    delete points;
-    delete lines_initial;
 
-    delete lines_split;
 
-    // Statically allocated in the class?
-    /*
-    delete directed_graph;
-
-    delete output_predicate;
-    */
 }

@@ -12,3 +12,21 @@ Currently the code is infinitly looping is some part. It is probably generating 
 I conjecture that the infinite looping is due to the generation of too many intersection events.
 
 It turns out that the problem might lie somewhere in the deallocation of the Event Queue.
+
+
+
+Expanded Mind
+------------
+
+I should stop trying to design the algorithm for the genaric case and I should design it for the scribble segmentation at hand.
+
+
+Timings
+------
+Bentley 16, 48 total milliseconds.
+
+Brute Force: 692, 723
+
+Size:3213
+Bentley :     2,  18, 13, 5, 12, 0, total : 9022049
+Brute Force : 1, 467, 13, 5, 11, 0, total : 9022049

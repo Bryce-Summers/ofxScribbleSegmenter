@@ -88,8 +88,8 @@ public:
 
     // IN the line_tuple.
     // OUT : The tuples that are above and below.
-    void addTuple(LineTuple * line_tuple, LineTuple ** above, LineTuple ** below);
-    void removeTuple(LineTuple * line_tuple, LineTuple ** above, LineTuple ** below);
+    void addTuple(LineTuple * line_tuple);
+    void removeTuple(LineTuple * line_tuple);
 
 private:
     set<LineTuple *, LineTupleCompare> bst;
@@ -104,10 +104,9 @@ class Event
         Event()
         {
             tuple1 = NULL;
-            tuple2 = NULL;
         }
 
-        enum Type{ENTER, EXIT, INTERSECTION};
+        enum Type{ENTER, EXIT};
 
         Type type;
 
@@ -115,7 +114,6 @@ class Event
         float y;
 
         LineTuple * tuple1;
-        LineTuple * tuple2;
 
 };
 
@@ -130,7 +128,6 @@ class EventPQ
             {
                 // Equal.
                 if(e1.tuple1 == e2.tuple1 &&
-                   e1.tuple2 == e2.tuple2 &&
                    e1.type == e2.type)
                 {
                     return false;
@@ -168,22 +165,23 @@ class EventPQ
 
         // -- Constructor.
         // Takes a list of the initial lines and adds start and end events for each of them.
-        EventPQ(std::vector<scrib::Line*> * lines);
+        EventPQ(std::vector<scrib::Line> * lines);
         virtual ~EventPQ(){};
 
         std::set<Event, EventCompare> PQ;
 
-        // Intersection Events are gurranteed to have higher segment as the first tuple before the intersection point.
-        void addIntersectionEvent(LineTuple * tuple1, LineTuple * tuple2);
-        void removeIntersectionEvent(LineTuple * tuple1, LineTuple * tuple2);
-
         Event delMin();
         bool isEmpty();
+
+        int size()
+        {
+            return PQ.size();
+        }
 
     private:
 
         void populateEvent(Event &enter, Event &exit, ofPoint &p1, ofPoint &p2, scrib::Line * line);
-        void addOrRemoveIntersectionEvent(LineTuple * tuple1, LineTuple * tuple2, bool should_remove);
+
 };
 
 class Intersector
@@ -195,20 +193,7 @@ public:
 
     // Calls the Line::intersect method on all intersecting lines.
     // Does not treat lines that intersect at common points as intersecting.
-    void intersect(std::vector<scrib::Line*> * lines);
-
-private:
-    // Adds neighbor events
-    void neighbor_event(LineTuple * tuple1, LineTuple * tuple2,
-                        EventPQ& event_queue);
-
-
-    // Mutates the two tuples, such that their effective ordering in the binary tree will be reversed.
-    void swap_tuples(LineTuple * tuple1, LineTuple * tuple2, float x, float y);
-
-    // Returns true if an intersection event has occured before.
-    // This is to prevent infinite loops.
-    bool check_repeat_event(LineTuple * t1, LineTuple * t2, set<pair<LineTuple *, LineTuple *> > &event_set);
+    void intersect(std::vector<scrib::Line> * lines);
 };
 
 }

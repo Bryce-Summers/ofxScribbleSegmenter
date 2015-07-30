@@ -25,15 +25,12 @@ class Line
          */
         bool intersect(Line * other);
 
-        // Simply returns whether this line intersects the other line.
-        bool intersectPredicate(Line * other);
-
         // Returns a signed floating point number indicating which direction the given point is relative to this line.
         float line_side_test(ofPoint p);
 
         // Appends all of the split set of lines in order to the output vector.
         // Adds itself if it does not contain any split lines.
-        void getSplitLines(std::vector<Line *> * lines_collector);
+        void getSplitLines(std::vector<Line> * lines_collector);
 
         // This function should only be called after a call to intersect has returned true.
         ofPoint getLatestIntersectionPoint();
@@ -62,12 +59,6 @@ class Line
 
         void sort_sub_points();
 
-
-        // Contains a valid result of the latest intersection point that
-        // caused intersect to return true.
-        int latest_intersection_index;
-
-        map<scrib::Line *, bool> intersection_predicate;
 };
 
 }
