@@ -90,7 +90,6 @@ bool Line::intersect(Line * other)
     other->split_points_indices.push_back(index);
 
     return true;
-
 }
 
 // Returns -1 on one side of the line.

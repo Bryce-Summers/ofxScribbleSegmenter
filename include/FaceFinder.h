@@ -15,16 +15,21 @@
 class FaceFinder
 {
     public:
-        FaceFinder(bool useBentleyOttman = true){bUseBentleyOttman = useBentleyOttman;};
+        FaceFinder(bool useFastAlgo = true){bUseFastAlgo = useFastAlgo;};
         virtual ~FaceFinder(){};
 
+        // Derive faces from a single polyline input.
         std::vector< std::vector<ofPoint> *> * FindFaces(std::vector<ofPoint> * inputs);
 
+        // Deive faces from a set list of vertice disjoint polyline inputs.
+        std::vector< std::vector<ofPoint> *> * FindFaces(std::vector< std::vector<ofPoint> *> * inputs);
 
     protected:
     private:
 
-        bool bUseBentleyOttman;
+        inline std::vector<std::vector<ofPoint> *> * do_the_rest();
+
+        bool bUseFastAlgo;
 
         // Initializes the original lines from the input points.
         // Starts up the indexed collection of points.

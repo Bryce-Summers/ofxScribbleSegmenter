@@ -6,19 +6,33 @@ void ofApp::setup(){
     num = 0;
 
 
-    points.push_back(ofPoint(20, 0));//0
-    points.push_back(ofPoint(90, 100));//0
-    points.push_back(ofPoint(90, 0));//2
-    points.push_back(ofPoint(10, 100));//3
-    points.push_back(ofPoint(50, 0));//4
-    points.push_back(ofPoint(100, 80));//5
-    points.push_back(ofPoint(0, 80));//6
+    points.push_back(ofPoint(50, 50));//0
+    points.push_back(ofPoint(150, 50));//0
+    points.push_back(ofPoint(150, 150));//2
+    points.push_back(ofPoint(52, 150));//3
+    points.push_back(ofPoint(52, 48));//3
 
+    points_2.push_back(ofPoint(0, 0));//0
+    points_2.push_back(ofPoint(100, 0));//0
+    points_2.push_back(ofPoint(100, 100));//2
+    points_2.push_back(ofPoint(2, 100));//3
+    points_2.push_back(ofPoint(2, -10));//3
+
+    std::vector< std::vector<ofPoint> *> input;
+
+    input.push_back(&points);
+    input.push_back(&points_2);
 
     std::vector< std::vector<ofPoint> *> * faces;
 
-    shapes = segmenter_bentley.FindFaces(&points);
-    shapes = segmenter_brute.FindFaces(&points);
+
+    //shapes = segmenter_bentley.FindFaces(&points);
+    //shapes = segmenter_brute.FindFaces(&points);
+
+    // Test multiple polyline input.
+    //shapes = segmenter_bentley.FindFaces(&input);
+    shapes = segmenter_brute.FindFaces(&input);
+
     cout << "setup done!" << endl;
     cout << shapes->size() << " Cycles!" << endl;
 
@@ -45,12 +59,17 @@ void ofApp::draw(){
     // -- Draw a particular region.
     int len = shapes -> size();
 
-    for(int i = 0; i < len; i++)
+
+    int i = num;
+    //for(int i = 0; i < len; i++)
+    if(i >= 0 && i < len)
     {
+        /*
         if(i != num)
         {
             continue;
         }
+        */
 
         std::vector<ofPoint> * points = shapes -> at(i);
 
@@ -77,20 +96,27 @@ void ofApp::draw(){
 
     // -- Draw the entire scribble.
 
-    ofPath p2 = ofPath();
-    p2.setStrokeColor(128);
-    p2.setStrokeWidth(1);
+    drawPath(points);
+    drawPath(points_2);
 
-    len = points.size();
-    p2.moveTo(points[0]);
+}
+
+void ofApp::drawPath(vector<ofPoint> &points)
+{
+    // Points 2.
+    ofPath p3 = ofPath();
+    p3.setStrokeColor(128);
+    p3.setStrokeWidth(1);
+
+    int len = points.size();
+    p3.moveTo(points[0]);
     for(int i = 1; i < len; i++)
     {
-        p2.lineTo(points[i]);
+        p3.lineTo(points[i]);
     }
 
-    p2.setFilled(false);
-    p2.draw();
-
+    p3.setFilled(false);
+    p3.draw();
 }
 
 //--------------------------------------------------------------
@@ -132,6 +158,7 @@ void ofApp::mousePressed(int x, int y, int button){
 
     num = -1;
     points.clear();
+    points_2.clear();
 }
 
 //--------------------------------------------------------------
@@ -147,7 +174,7 @@ void ofApp::mouseReleased(int x, int y, int button)
 
     cout<< "Rebuilt Scribble" << endl;
     cout << shapes_new2->size() << " Brute Cycles!" << endl;
-    cout << shapes->size() << " Bentley Cycles!" << endl;
+    cout << shapes->size() << " Fast Algo Cycles!" << endl;
     cout << "Size = " << points.size() << endl;
 
     num = 0;

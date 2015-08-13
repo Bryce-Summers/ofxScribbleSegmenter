@@ -11,61 +11,55 @@ FaceFinder::~FaceFinder()
     //dtor
 }*/
 
+std::vector< std::vector<ofPoint> *> * FaceFinder::FindFaces(std::vector< std::vector<ofPoint> *> * inputs)
+{
+    // Make sure that the previous data is cleared.
+    int len = inputs->size();
+    for(int i = 0; i < len; i++)
+    {
+        loadInput(inputs -> at(i));
+    }
+
+    return do_the_rest();
+}
+
 std::vector< std::vector<ofPoint> *> * FaceFinder::FindFaces(std::vector<ofPoint> * inputs)
 {
-    long t0 = ofGetElapsedTimeMicros();
+    // Make sure that the previous data is cleared.
     loadInput(inputs);
 
-    long t1 = ofGetElapsedTimeMicros();
-    splitIntersectionPoints();
-    long t2 = ofGetElapsedTimeMicros();
+    return do_the_rest();
+}
 
+inline std::vector<std::vector<ofPoint> *> * FaceFinder::do_the_rest()
+{
+    splitIntersectionPoints();
     convert_to_directedGraph();
-    long t3 = ofGetElapsedTimeMicros();
     sort_graph_by_edge_angle();
 
-    long t4 = ofGetElapsedTimeMicros();
     std::vector< std::vector<ofPoint> *> * output = deriveFaces();
-    long t5 = ofGetElapsedTimeMicros();
 
     cleanup();
-    long t6 = ofGetElapsedTimeMicros();
-
-    if(bUseBentleyOttman)
-    {
-        printf ("Bentley : %6d, %6d, %6d, %6d, %6d, %6d, total : %6d \n ", (int)(t1 - t0)/1000,
-                (int)(t2 - t1)/1000, (int)(t3 - t2)/1000, (int)(t4 - t3)/1000, (int)(t5 - t4)/1000, (int)(t6 - t5)/1000, (int)(t6 - t0));
-    }
-    else
-    {
-        printf ("Brute Force :  %6d, %6d, %6d, %6d, %6d, %6d, total : %6d \n ", (int)(t1 - t0)/1000,
-                (int)(t2 - t1)/1000, (int)(t3 - t2)/1000, (int)(t4 - t3)/1000, (int)(t5 - t4)/1000, (int)(t6 - t5)/1000, (int)(t6 - t0));
-    }
 
     return output;
 }
 
 void FaceFinder::loadInput(std::vector<ofPoint> * inputs)
 {
-
     // Populate the original points.
-    points.clear();
-
-    int len = inputs->size();
+    int len = inputs -> size();
+    int offset = points.size();
 
     for(int i = 0; i < len; i++)
     {
         ofPoint input_point = inputs -> at(i) + ofPoint(ofRandomf(), ofRandomf());
         points.push_back(input_point);
-        //cout << input_point << endl;
     }
 
     // Populate the original lines.
-    lines_initial.clear();
-
     for(int i = 0; i < len - 1; i++)
     {
-        lines_initial.push_back(scrib::Line(i, i + 1, &points));
+        lines_initial.push_back(scrib::Line(i + offset, i + offset + 1, &points));
     }
 
 }
@@ -73,43 +67,31 @@ void FaceFinder::loadInput(std::vector<ofPoint> * inputs)
 void FaceFinder::splitIntersectionPoints()
 {
 
-    // Use an (|lines| + |intersections|)*log(|lines|) algorithm.
-    // Bentley–Ottmann
-    if(bUseBentleyOttman)
+    scrib::Intersector intersector;
+
+    // Use a custom made O(maximum vertical overlap * log(maximum vertical overlap).
+    // Very small constant factors, cache friendly.
+    if(bUseFastAlgo)
     {
-        scrib::Intersector intersector;
         intersector.intersect(&lines_initial);
-        //cout << "Face-Finder : Done performing Bentley Ottman intersections." << endl;
     }
-
-    int numLines = lines_initial.size();
-
-    // N^2 Naive Intersection Algorithm.
-
-    if(!bUseBentleyOttman)
+    else
     {
-        // -- Intersect all of the lines.
-        for(int a = 0; a < numLines; a++)
-        for(int b = a + 1; b < numLines; b++)
-        {
-            scrib::Line * line = &(lines_initial[b]);
-            lines_initial[a].intersect(line);
-        }
-
-        //cout << "Face-Finder : Done performing Brute Force intersections." << endl;
+        // Naive brute force algo.
+        // N^2. Small constants. As robust as it gets.
+        intersector.intersect_brute_force(&lines_initial);
     }
-
 
     // Populate the split sequence of lines.
     lines_split.clear();
+
+    int numLines = lines_initial.size();
 
     for(int i = 0; i < numLines; i++)
     {
         scrib::Line line = lines_initial[i];
         line.getSplitLines(&lines_split);
     }
-
-    //cout << "Face-Finder : Done Splitting Lines." << endl;
 }
 
 void FaceFinder::convert_to_directedGraph()
@@ -228,7 +210,7 @@ std::vector< std::vector<ofPoint> *> * FaceFinder::deriveFaces()
 
         int numEdges = outgoing_vertices -> size();
 
-        // Itererate through all outgoing edges at each point.
+        // Iterate through all outgoing edges at each point.
         for(int edge_index = 0; edge_index < numEdges; edge_index++)
         {
             // Skip Edges that have already been processed.
@@ -321,7 +303,34 @@ int FaceFinder::find_outgoing_index_of_edge(int p1, int p2)
 
 void FaceFinder::cleanup()
 {
+    // Remove the previous data.
 
+    // Erase the stack class allocated memory.
+    points.clear();
+    lines_initial.clear();
+    lines_split.clear();
 
+    // -- Deallocate the memory heap allocated in this class.
+
+    //std::map<int, std::vector<int> *> directed_graph
+
+    for(std::map<int, std::vector<int> *>::iterator iter = directed_graph.begin(); iter != directed_graph.end(); ++iter)
+    {
+        //iter->first;
+        delete iter->second;
+
+    }
+
+    directed_graph.clear();
+
+    //std::map<int, std::vector<bool> *> output_predicate;
+
+    for(std::map<int, std::vector<bool> *>::iterator iter = output_predicate.begin(); iter != output_predicate.end(); ++iter)
+    {
+        //iter->first;
+        delete iter->second;
+    }
+
+    output_predicate.clear();
 
 }

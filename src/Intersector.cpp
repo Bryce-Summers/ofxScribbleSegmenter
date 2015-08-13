@@ -13,6 +13,17 @@
 
 namespace scrib{
 
+// Naive N^2 Intersection Algorithm.
+void Intersector::intersect_brute_force(std::vector<scrib::Line> * lines)
+{
+    int numLines = lines -> size();
+    for(int a = 0; a < numLines; a++)
+    for(int b = a + 1; b < numLines; b++)
+    {
+        lines->at(a).intersect(&(lines->at(b)));
+    }
+}
+
 void Intersector::intersect(std::vector<scrib::Line> * lines)
 {
     EventPQ event_queue(lines);

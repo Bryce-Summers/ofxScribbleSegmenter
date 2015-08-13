@@ -194,6 +194,7 @@ public:
     // Calls the Line::intersect method on all intersecting lines.
     // Does not treat lines that intersect at common points as intersecting.
     void intersect(std::vector<scrib::Line> * lines);
+    void intersect_brute_force(std::vector<scrib::Line> * lines);
 };
 
 }

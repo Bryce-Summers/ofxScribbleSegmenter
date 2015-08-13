@@ -23,6 +23,7 @@ class ofApp : public ofBaseApp{
     private:
 
         vector<ofPoint> points;
+        vector<ofPoint> points_2;
 
         std::vector< std::vector<ofPoint> *> * shapes;
 
@@ -33,4 +34,6 @@ class ofApp : public ofBaseApp{
 
         int num;
 
+        // Helpful path drawing function.
+       void drawPath(vector<ofPoint> &points);
 };

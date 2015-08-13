@@ -1478,17 +1478,17 @@
 	"ofCamera.h"
 	"ofEvents.h"
 
-1438196841 c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\scribblefaces\src\ofapp.h
+1439492661 c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\scribblefaces\src\ofapp.h
 	"ofMain.h"
 	"../include/FaceFinder.h"
 
-1438234230 source:c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\scribblefaces\src\ofapp.cpp
+1439498686 source:c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\scribblefaces\src\ofapp.cpp
 	"ofApp.h"
 
-1438237552 source:c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\scribblefaces\src\facefinder.cpp
+1439498421 source:c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\scribblefaces\src\facefinder.cpp
 	"../include/FaceFinder.h"
 
-1438238915 c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\scribblefaces\include\facefinder.h
+1439498988 c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\scribblefaces\include\facefinder.h
 	<vector>
 	"ofMain.h"
 	"Line.h"
@@ -1498,7 +1498,7 @@
 	<vector>
 	"ofMain.h"
 
-1438237475 source:c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\scribblefaces\src\line.cpp
+1439498803 source:c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\scribblefaces\src\line.cpp
 	"../include/Line.h"
 
 1435353896 source:c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\scribblefaces\src\lineintersector.cpp
@@ -1520,14 +1520,14 @@
 	<math.h>
 	"../include/ofxSweepLine.h"
 
-1438236261 c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\scribblefaces\include\intersector.h
+1439490738 c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\scribblefaces\include\intersector.h
 	"ofMain.h"
 	<math.h>
 	<list>
 	<set>
 	"Line.h"
 
-1438238422 source:c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\scribblefaces\src\intersector.cpp
+1439491289 source:c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\scribblefaces\src\intersector.cpp
 	<iostream>
 	<math.h>
 	"../include/Intersector.h"
