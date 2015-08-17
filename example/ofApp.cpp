@@ -5,18 +5,28 @@ void ofApp::setup(){
 
     num = 0;
 
+    // These lists of points represent square-ish shapes.
+    /*  |
+     * -+-----.
+     *  |     |
+     *  .-----.
+     */
 
+    // Compute an example involving 2 polylines.
     points.push_back(ofPoint(50, 50));//0
     points.push_back(ofPoint(150, 50));//0
     points.push_back(ofPoint(150, 150));//2
     points.push_back(ofPoint(52, 150));//3
     points.push_back(ofPoint(52, 48));//3
 
-    points_2.push_back(ofPoint(0, 0));//0
-    points_2.push_back(ofPoint(100, 0));//0
-    points_2.push_back(ofPoint(100, 100));//2
-    points_2.push_back(ofPoint(2, 100));//3
-    points_2.push_back(ofPoint(2, -10));//3
+    int offset = 0;  // Intersection, one external face with 12 points.
+    //int offset = 200; // No intersection, 2 external faces with 8 points each.
+
+    points_2.push_back(ofPoint(offset + 0, 0));//0
+    points_2.push_back(ofPoint(offset + 100, 0));//0
+    points_2.push_back(ofPoint(offset + 100, 100));//2
+    points_2.push_back(ofPoint(offset + 2, 100));//3
+    points_2.push_back(ofPoint(offset + 2, -10));//3
 
     std::vector< std::vector<ofPoint> *> input;
 
@@ -26,16 +36,52 @@ void ofApp::setup(){
     std::vector< std::vector<ofPoint> *> * faces;
 
 
-    //shapes = segmenter_bentley.FindFaces(&points);
+    // -- Use these function calls to compute the faces for
+    //    either of the polylines by themeselves.
+    //shapes = segmenter_fast.FindFaces(&points);
     //shapes = segmenter_brute.FindFaces(&points);
 
-    // Test multiple polyline input.
-    //shapes = segmenter_bentley.FindFaces(&input);
-    shapes = segmenter_brute.FindFaces(&input);
+
+    // -- Use these function calls to compute the faces when the
+    //    plane is segmented by both polylines.
+    shapes = segmenter_fast.FindFaces(&input);
+    //shapes = segmenter_brute.FindFaces(&input);
+
+    external_face_indices.clear();
+    segmenter_fast.determineExternalFaces(shapes, &external_face_indices);
+
 
     cout << "setup done!" << endl;
     cout << shapes->size() << " Cycles!" << endl;
+    cout << "There is/are " << external_face_indices.size() << " external faces with ";
 
+    int len = external_face_indices.size();
+    for(int i = 0; i < len; i++)
+    {
+        int shapes_index = external_face_indices[i];
+        int polygon_size = shapes -> at(shapes_index) -> size();
+        cout << polygon_size << ", ";
+    }
+
+    cout << " points in each of them respectively." << endl;
+
+    cout << "\n Information about all of the polygons: \n" << endl;
+
+    len = shapes -> size();
+    for(int i = 0; i < len; i++)
+    {
+        std::vector<scrib::point_info> * polygon = shapes->at(i);
+        int polygon_len = polygon -> size();
+
+        cout << "Polygon " << i << endl;
+
+        for(int j = 0; j < polygon_len; j++)
+        {
+            scrib::point_info p_info = polygon -> at(j);
+            cout << " --Point : " << p_info.point <<
+                    ", index = " << p_info.ID << endl;
+        }
+    }
 }
 
 //--------------------------------------------------------------
@@ -45,6 +91,8 @@ void ofApp::update(){
 
 //--------------------------------------------------------------
 void ofApp::draw(){
+
+
 
     if(shapes == NULL)
     {
@@ -71,7 +119,7 @@ void ofApp::draw(){
         }
         */
 
-        std::vector<ofPoint> * points = shapes -> at(i);
+        std::vector<scrib::point_info> * points = shapes -> at(i);
 
         int len2 = points->size();
 
@@ -79,12 +127,12 @@ void ofApp::draw(){
         p.setStrokeColor(128);
         p.setStrokeWidth(5);
 
-        ofPoint pt = points -> at(0);
+        ofPoint pt = points -> at(0).point;
         p.moveTo(pt.x, pt.y);
 
         for(int i2 = 1; i2 < len2; i2++)
         {
-            ofPoint pt = points -> at(i2);
+            ofPoint pt = points -> at(i2).point;
             p.lineTo(pt.x, pt.y);
         }
 
@@ -99,6 +147,8 @@ void ofApp::draw(){
     drawPath(points);
     drawPath(points_2);
 
+    ofDrawBitmapString("Press 'A' and 'D' to cycle left and right through the faces.", 20, 170);
+    ofDrawBitmapString("Click and drag the mouse in a wild pattern, then release to test new scribbles!", 20, 200);
 }
 
 void ofApp::drawPath(vector<ofPoint> &points)
@@ -124,15 +174,16 @@ void ofApp::keyPressed(int key){
 
     if(key == 'd')
     {
-        num++;
+        // Increment mod len.
         int len = shapes->size();
-        num = min(len - 1, num);
+        num = (num + 1) % len;
     }
 
     if(key == 'a')
     {
-        num--;
-        num = max(num, 0);
+        // Decrement mod len.
+        int len = shapes->size();
+        num = (num + len - 1) % len;
     }
 
 }
@@ -165,8 +216,8 @@ void ofApp::mousePressed(int x, int y, int button){
 void ofApp::mouseReleased(int x, int y, int button)
 {
 
-    std::vector< std::vector<ofPoint> *> * shapes_new  = segmenter_bentley.FindFaces(&points);
-    std::vector< std::vector<ofPoint> *> * shapes_new2 = segmenter_brute.FindFaces(&points);
+    std::vector< std::vector<scrib::point_info> *> * shapes_new  = segmenter_fast.FindFaces(&points);
+    std::vector< std::vector<scrib::point_info> *> * shapes_new2 = segmenter_brute.FindFaces(&points);
 
     mutex.lock();
     shapes = shapes_new;

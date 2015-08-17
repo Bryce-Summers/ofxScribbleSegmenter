@@ -24,11 +24,13 @@ class ofApp : public ofBaseApp{
 
         vector<ofPoint> points;
         vector<ofPoint> points_2;
+        std::vector<int> external_face_indices;
 
-        std::vector< std::vector<ofPoint> *> * shapes;
+        std::vector< std::vector<scrib::point_info> *> * shapes;
 
-        FaceFinder segmenter_bentley = FaceFinder(true);
-        FaceFinder segmenter_brute = FaceFinder(false);
+
+        scrib::FaceFinder segmenter_fast  = scrib::FaceFinder();
+        scrib::FaceFinder segmenter_brute = scrib::FaceFinder(false);
 
         ofMutex mutex;
 

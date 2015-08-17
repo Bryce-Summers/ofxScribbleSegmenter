@@ -1532,3 +1532,48 @@
 	<math.h>
 	"../include/Intersector.h"
 
+1410274994 source:c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\ofxscribblesegmenter\icon.rc
+
+1439837940 source:c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\ofxscribblesegmenter\src\facefinder.cpp
+	"../include/FaceFinder.h"
+
+1439837634 c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\ofxscribblesegmenter\include\facefinder.h
+	<vector>
+	"ofMain.h"
+	"Line.h"
+	"Intersector.h"
+
+1438237460 c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\ofxscribblesegmenter\include\line.h
+	<vector>
+	"ofMain.h"
+
+1439490738 c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\ofxscribblesegmenter\include\intersector.h
+	"ofMain.h"
+	<math.h>
+	<list>
+	<set>
+	"Line.h"
+
+1439491289 source:c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\ofxscribblesegmenter\src\intersector.cpp
+	<iostream>
+	<math.h>
+	"../include/Intersector.h"
+
+1439498803 source:c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\ofxscribblesegmenter\src\line.cpp
+	"../include/Line.h"
+
+1410274994 source:c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\ofxscribblesegmenter\src\main.cpp
+	"ofMain.h"
+	"ofApp.h"
+
+1439837405 source:c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\ofxscribblesegmenter\example\ofapp.cpp
+	"ofApp.h"
+
+1439837068 c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\ofxscribblesegmenter\example\ofapp.h
+	"ofMain.h"
+	"../include/FaceFinder.h"
+
+1410274994 source:c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\ofxscribblesegmenter\example\main.cpp
+	"ofMain.h"
+	"ofApp.h"
+

@@ -11,7 +11,9 @@ FaceFinder::~FaceFinder()
     //dtor
 }*/
 
-std::vector< std::vector<ofPoint> *> * FaceFinder::FindFaces(std::vector< std::vector<ofPoint> *> * inputs)
+namespace scrib{
+
+std::vector< std::vector<point_info> *> * FaceFinder::FindFaces(std::vector< std::vector<ofPoint> *> * inputs)
 {
     // Make sure that the previous data is cleared.
     int len = inputs->size();
@@ -23,7 +25,7 @@ std::vector< std::vector<ofPoint> *> * FaceFinder::FindFaces(std::vector< std::v
     return do_the_rest();
 }
 
-std::vector< std::vector<ofPoint> *> * FaceFinder::FindFaces(std::vector<ofPoint> * inputs)
+std::vector< std::vector<point_info> *> * FaceFinder::FindFaces(std::vector<ofPoint> * inputs)
 {
     // Make sure that the previous data is cleared.
     loadInput(inputs);
@@ -31,13 +33,13 @@ std::vector< std::vector<ofPoint> *> * FaceFinder::FindFaces(std::vector<ofPoint
     return do_the_rest();
 }
 
-inline std::vector<std::vector<ofPoint> *> * FaceFinder::do_the_rest()
+inline std::vector<std::vector<point_info> *> * FaceFinder::do_the_rest()
 {
     splitIntersectionPoints();
     convert_to_directedGraph();
     sort_graph_by_edge_angle();
 
-    std::vector< std::vector<ofPoint> *> * output = deriveFaces();
+    std::vector< std::vector<point_info> *> * output = deriveFaces();
 
     cleanup();
 
@@ -53,6 +55,13 @@ void FaceFinder::loadInput(std::vector<ofPoint> * inputs)
     for(int i = 0; i < len; i++)
     {
         ofPoint input_point = inputs -> at(i) + ofPoint(ofRandomf(), ofRandomf());
+
+        // A Paranoid vertical line prevention technique.
+        if((offset > 0 || i > 0) && points[offset + i - 1].x == input_point.x)
+        {
+            input_point.x += .001;
+        }
+
         points.push_back(input_point);
     }
 
@@ -193,10 +202,10 @@ void FaceFinder::sort_vertice_by_edge_angle(int center_point_index, std::vector<
 
 }
 
-std::vector< std::vector<ofPoint> *> * FaceFinder::deriveFaces()
+std::vector< std::vector<point_info> *> * FaceFinder::deriveFaces()
 {
     // -- Initialize Output Structures.
-    std::vector< std::vector<ofPoint> *> * output = new std::vector< std::vector<ofPoint> *>();
+    std::vector< std::vector<point_info> *> * output = new std::vector< std::vector<point_info> *>();
 
     // For all edges, output their cycle once.
 
@@ -227,9 +236,9 @@ std::vector< std::vector<ofPoint> *> * FaceFinder::deriveFaces()
     return output;
 }
 
-std::vector<ofPoint> * FaceFinder::getCycle(int p1_original, int p2_original, int p2_original_outgoing_index)
+std::vector<point_info> * FaceFinder::getCycle(int p1_original, int p2_original, int p2_original_outgoing_index)
 {
-    std::vector<ofPoint> * output = new std::vector<ofPoint>();
+    std::vector<point_info> * output = new std::vector<point_info>();
 
     int i1 = p1_original;
     int i2 = p2_original;
@@ -242,7 +251,7 @@ std::vector<ofPoint> * FaceFinder::getCycle(int p1_original, int p2_original, in
     do
     {
         setPredicate(i1, outgoing_index);
-        output->push_back(points[i2]);
+        output->push_back(point_info(points[i2], i2));// i2 is the Global index.
         getNextEdge(&i1, &i2, &outgoing_index);
     }
     while(i1 != p1_original || i2 != p2_original);
@@ -332,5 +341,41 @@ void FaceFinder::cleanup()
     }
 
     output_predicate.clear();
+
+}
+
+void FaceFinder::determineExternalFaces(std::vector<std::vector<point_info> *> * input, std::vector<int> * output)
+{
+    int len = input -> size();
+
+    for(int index = 0; index < len; index++)
+    {
+        float area = computeAreaOfPolygon(input->at(index));
+
+        if(area > 0)
+        {
+            output->push_back(index);
+        }
+    }
+}
+
+
+float FaceFinder::computeAreaOfPolygon(std::vector<point_info> * closed_polygon)
+{
+    int len = closed_polygon -> size();
+    ofPoint * p1 = &(closed_polygon -> at(len - 1).point);
+
+    float area = 0.0;
+
+    // Compute based on Green's Theorem.
+    for(int i = 0; i < len; i++)
+    {
+        ofPoint * p2 = &(closed_polygon->at(i).point);
+        area += (p2 -> x + p1 -> x)*(p2->y - p1->y);
+        p1 = p2;// Shift p2 to p1.
+    }
+
+    return area/2.0;
+}
 
 }

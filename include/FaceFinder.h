@@ -12,6 +12,23 @@
 #include "Line.h"
 #include "Intersector.h"
 
+namespace scrib{
+
+class point_info
+{
+    public :
+
+        // -- Constructor.
+        point_info(ofPoint p, int id)
+        {
+            point = p;
+            ID = id;
+        }
+
+        ofPoint point;
+        int ID;
+};
+
 class FaceFinder
 {
     public:
@@ -19,15 +36,30 @@ class FaceFinder
         virtual ~FaceFinder(){};
 
         // Derive faces from a single polyline input.
-        std::vector< std::vector<ofPoint> *> * FindFaces(std::vector<ofPoint> * inputs);
+        // No gurrantee is made about the order of the polygons.
+        // The Output is a list of sub polygons.
+        // All of the points given as inputs to this algorithm will be treated as if they were distinct.
+        // The points will also be randomly offset by a 'small' amount to prevent the existence of vertical lines.
+        std::vector< // List of Polygons.
+        std::vector< // Each polygon is a list of points.
+        point_info // Information about the point.
+        > *> * FindFaces(std::vector<ofPoint> * inputs);
 
-        // Deive faces from a set list of vertice disjoint polyline inputs.
-        std::vector< std::vector<ofPoint> *> * FindFaces(std::vector< std::vector<ofPoint> *> * inputs);
+        // Derive faces from a set list of vertice disjoint polyline inputs.
+        std::vector< // List of Polygons.
+        std::vector< // Each polygon is a list of points.
+        point_info // Information about the Point.
+        > *> * FindFaces(std::vector< std::vector<ofPoint> *> * inputs);
+
+        // Appends the indices of any external faces amongst the input list of faces to the output vector.
+        // NOTE : The input type is equivilant to the output type of the face finding functions,
+        // so using this function may be a natural extension of using the original functions.
+        void determineExternalFaces(std::vector<std::vector<point_info> *> * input, std::vector<int> * output);
 
     protected:
     private:
 
-        inline std::vector<std::vector<ofPoint> *> * do_the_rest();
+        inline std::vector<std::vector<point_info> *> * do_the_rest();
 
         bool bUseFastAlgo;
 
@@ -51,7 +83,7 @@ class FaceFinder
         void sort_vertice_by_edge_angle(int center_point_index, std::vector<int> * outgoing_indices);
 
         // Uses the computed data structures to construct the set of all cycle lists.
-        std::vector< std::vector<ofPoint> *> * deriveFaces();
+        std::vector< std::vector<point_info> *> * deriveFaces();
 
         /* Outputs the cycle containing the directed edge p1 --> p2, where p2 = dg[p1][p2_index].
          * Traces cycles by always consistently following the rightmost edges.
@@ -60,11 +92,12 @@ class FaceFinder
          * The "output_predicate" structure is used to keep track of which edges have been outputted.
          * Every edge direction is guaranteed to be in exactly one cycle. Each undirected edge can be though of as being in two cycles.
          */
-        std::vector<ofPoint> * getCycle(int p1, int p2, int p2_index);
+        std::vector<point_info> * getCycle(int p1, int p2, int p2_index);
 
         /* INPUT : the indices of the directed edge p1 --> p2.
          *
          * OUTPUT : the indice pointers will point to the new directed edge p1' --> p2'
+         * NOTE : Indices are integers corresponding to the location in the global points array for each point.
          */
         void getNextEdge(int * p1_index, int * p2_index, int * outgoing_index);
 
@@ -98,6 +131,16 @@ class FaceFinder
         // false --> proccess this edge, it is part of a cycle that has not yet been output.
         std::map<int, std::vector<bool> *> output_predicate;
 
+        /*
+         * http://math.blogoverflow.com/2014/06/04/greens-theorem-and-area-of-polygons/
+         * Computes the area of a 2D polygon directly from the polygon's coordinates.
+         * The area will be positive or negative depending on the
+         * clockwise / counter clockwise orientation of the points.
+         */
+        float computeAreaOfPolygon(std::vector<point_info> * closed_polygon);
+
 };
+
+}
 
 #endif // FACEFINDER_H
