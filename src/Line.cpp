@@ -34,6 +34,27 @@ bool Line::intersect(Line * other)
         return false;
     }
 
+    // No intersection.
+    if(!detect_intersection(other))
+    {
+        return false;
+    }
+
+    report_intersection(other);
+    return true;
+
+}
+
+// Returns -1 on one side of the line.
+// Returns 0 if the point is on the line.
+// Returns 1 if the point is on the other side of the line.
+float Line::line_side_test(ofPoint c)
+{
+     return ((p2.x - p1.x)*(c.y - p1.y) - (p2.y - p1.y)*(c.x - p1.x));
+}
+
+inline bool Line::detect_intersection(Line * other)
+{
     float a1 = line_side_test(other -> p1);
     float a2 = line_side_test(other -> p2);
 
@@ -44,12 +65,11 @@ bool Line::intersect(Line * other)
      * the points are not on strictly opposite sides of the line.
      * If the product is 0, then at least one of the points is on the line not containing the points.
      */
-    bool result = a1*a2 <= 0 && b1*b2 <= 0;
+    return a1*a2 <= 0 && b1*b2 <= 0;
+}
 
-    if(!result)
-    {
-        return false;
-    }
+inline void Line::report_intersection(Line * other)
+{
 
     // Find the intersection point.
 
@@ -77,29 +97,24 @@ bool Line::intersect(Line * other)
     float u = (dy * bd.x - dx * bd.y) / det;
     float v = (dy * ad.x - dx * ad.y) / det;
 
+    // The intersection is at time coordinates u and v.
+    // Note: Time is relative to the offsets, so p1 = time 0 and p2 is time 1.
+
+    // u is the time coordinate for this line.
     split_points_per.push_back(u);
+
+    // v is the time coordinate for the other line.
     other -> split_points_per.push_back(v);
 
     ofPoint intersection_point = as + ad*u;
 
     // Get the next index that will be used to store the newly created point.
     int index = points->size();
-    points->push_back(intersection_point);
+    points -> push_back(intersection_point);
 
     split_points_indices.push_back(index);
-    other->split_points_indices.push_back(index);
-
-    return true;
+    other -> split_points_indices.push_back(index);
 }
-
-// Returns -1 on one side of the line.
-// Returns 0 if the point is on the line.
-// Returns 1 if the point is on the other side of the line.
-float Line::line_side_test(ofPoint c)
-{
-     return ((p2.x - p1.x)*(c.y - p1.y) - (p2.y - p1.y)*(c.x - p1.x));
-}
-
 
 /*
 bool isLeft(Point a, Point b, Point c){

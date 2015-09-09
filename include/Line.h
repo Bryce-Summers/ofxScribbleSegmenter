@@ -59,6 +59,10 @@ class Line
 
         void sort_sub_points();
 
+        // Returns true iff this line segment intersects with the other line segment.
+        inline bool detect_intersection(Line * other);
+        inline void report_intersection(Line * other);
+
 };
 
 }
