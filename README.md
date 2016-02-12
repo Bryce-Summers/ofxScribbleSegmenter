@@ -57,7 +57,7 @@ It is also possible to derive faces for a list of polyline inputs.
 ```
 std::vector<std::vector<ofPoint> *> input;
 
-<Same code as in singular polyline case from her on out.>
+<Same code as in singular polyline case from here on out.>
 
 // - Function is overridden by a function of the same name that takes in a
 //   vector<vector<ofPoint *> >; instead of a vector<ofPoint>.
