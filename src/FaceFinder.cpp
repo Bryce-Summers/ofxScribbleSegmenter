@@ -13,6 +13,11 @@ FaceFinder::~FaceFinder()
 
 namespace scrib{
 
+void FaceFinder::setClosed(bool isClosed)
+{
+    closed_loop = isClosed;
+}
+
 std::vector< std::vector<point_info> *> * FaceFinder::FindFaces(std::vector< std::vector<ofPoint> *> * inputs)
 {
     // Make sure that the previous data is cleared.
@@ -50,6 +55,9 @@ void FaceFinder::loadInput(std::vector<ofPoint> * inputs)
 {
     // Populate the original points.
     int len = inputs -> size();
+
+    // The offset is the initial index of the first input point.
+    // We can therefore load multiple input lines and keep the indices distinct.
     int offset = points.size();
 
     for(int i = 0; i < len; i++)
@@ -69,6 +77,14 @@ void FaceFinder::loadInput(std::vector<ofPoint> * inputs)
     for(int i = 0; i < len - 1; i++)
     {
         lines_initial.push_back(scrib::Line(i + offset, i + offset + 1, &points));
+    }
+
+    // Add a line connecting the first and last points on the original set of input points if
+    // the face finder is in closed loop mode.
+    if(closed_loop)
+    {
+        // connects last point at index (len - 1 + offset) to the first point, located at index (0 + offset).
+        lines_initial.push_back(scrib::Line(len - 1 + offset, 0 + offset, &points));
     }
 
 }
@@ -357,25 +373,6 @@ void FaceFinder::determineExternalFaces(std::vector<std::vector<point_info> *> *
             output->push_back(index);
         }
     }
-}
-
-
-float FaceFinder::computeAreaOfPolygon(std::vector<point_info> * closed_polygon)
-{
-    int len = closed_polygon -> size();
-    ofPoint * p1 = &(closed_polygon -> at(len - 1).point);
-
-    float area = 0.0;
-
-    // Compute based on Green's Theorem.
-    for(int i = 0; i < len; i++)
-    {
-        ofPoint * p2 = &(closed_polygon->at(i).point);
-        area += (p2 -> x + p1 -> x)*(p2->y - p1->y);
-        p1 = p2;// Shift p2 to p1.
-    }
-
-    return area/2.0;
 }
 
 }

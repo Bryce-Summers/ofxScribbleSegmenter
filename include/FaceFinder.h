@@ -11,28 +11,19 @@
 #include "ofMain.h"
 #include "Line.h"
 #include "Intersector.h"
+#include "CurveFunctions.h"
 
 namespace scrib{
 
-class point_info
-{
-    public :
-
-        // -- Constructor.
-        point_info(ofPoint p, int id)
-        {
-            point = p;
-            ID = id;
-        }
-
-        ofPoint point;
-        int ID;
-};
 
 class FaceFinder
 {
     public:
-        FaceFinder(bool useFastAlgo = true){bUseFastAlgo = useFastAlgo;};
+        FaceFinder(bool useFastAlgo = true)
+        {
+            bUseFastAlgo = useFastAlgo;
+            closed_loop = false;
+        };
         virtual ~FaceFinder(){};
 
         // Derive faces from a single polyline input.
@@ -52,9 +43,14 @@ class FaceFinder
         > *> * FindFaces(std::vector< std::vector<ofPoint> *> * inputs);
 
         // Appends the indices of any external faces amongst the input list of faces to the output vector.
-        // NOTE : The input type is equivilant to the output type of the face finding functions,
+        // NOTE : The input type is equivelant to the output type of the face finding functions,
         // so using this function may be a natural extension of using the original functions.
         void determineExternalFaces(std::vector<std::vector<point_info> *> * input, std::vector<int> * output);
+
+        // Tells this face finder to interpret the input curve as a line if open and a closed loop if closed.
+        // If close, it will consider endpoints as attached to each other.
+        void setClosed(bool isClosed);
+
 
     protected:
     private:
@@ -62,6 +58,7 @@ class FaceFinder
         inline std::vector<std::vector<point_info> *> * do_the_rest();
 
         bool bUseFastAlgo;
+        bool closed_loop;
 
         // Initializes the original lines from the input points.
         // Starts up the indexed collection of points.
@@ -130,15 +127,6 @@ class FaceFinder
         // true  --> do not process this edge again, it is already in an output cycle.
         // false --> proccess this edge, it is part of a cycle that has not yet been output.
         std::map<int, std::vector<bool> *> output_predicate;
-
-        /*
-         * http://math.blogoverflow.com/2014/06/04/greens-theorem-and-area-of-polygons/
-         * Computes the area of a 2D polygon directly from the polygon's coordinates.
-         * The area will be positive or negative depending on the
-         * clockwise / counter clockwise orientation of the points.
-         */
-        float computeAreaOfPolygon(std::vector<point_info> * closed_polygon);
-
 };
 
 }

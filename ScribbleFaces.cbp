@@ -123,9 +123,13 @@
 		<Unit filename="icon.rc">
 			<Option compilerVar="WINDRES" />
 		</Unit>
+		<Unit filename="include/CurveFunctions.h" />
+		<Unit filename="include/OffsetCurves.h" />
+		<Unit filename="src/CurveFunctions.cpp" />
 		<Unit filename="src/FaceFinder.cpp" />
 		<Unit filename="src/Intersector.cpp" />
 		<Unit filename="src/Line.cpp" />
+		<Unit filename="src/OffsetCurves.cpp" />
 		<Extensions>
 			<code_completion />
 			<debugger />

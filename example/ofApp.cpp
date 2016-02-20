@@ -41,6 +41,7 @@ void ofApp::setup(){
     //shapes = segmenter_fast.FindFaces(&points);
     //shapes = segmenter_brute.FindFaces(&points);
 
+    segmenter_fast.setClosed(true);
 
     // -- Use these function calls to compute the faces when the
     //    plane is segmented by both polylines.
@@ -92,14 +93,12 @@ void ofApp::update(){
 //--------------------------------------------------------------
 void ofApp::draw(){
 
-
-
     if(shapes == NULL)
     {
         return;
     }
 
-    ofFill();
+    //ofFill();
     ofSetColor(ofColor::red);
 
     mutex.lock();
@@ -107,10 +106,9 @@ void ofApp::draw(){
     // -- Draw a particular region.
     int len = shapes -> size();
 
-
     int i = num;
-    //for(int i = 0; i < len; i++)
-    if(i >= 0 && i < len)
+    for(int i = 0; i < len; i++)
+    //if(i >= 0 && i < len)
     {
         /*
         if(i != num)
@@ -125,7 +123,7 @@ void ofApp::draw(){
 
         ofPath p = ofPath();
         p.setStrokeColor(128);
-        p.setStrokeWidth(5);
+        p.setStrokeWidth(1);
 
         ofPoint pt = points -> at(0).point;
         p.moveTo(pt.x, pt.y);
@@ -136,6 +134,7 @@ void ofApp::draw(){
             p.lineTo(pt.x, pt.y);
         }
 
+        p.setFilled(false);
         p.close();
         p.draw();
     }
@@ -219,13 +218,22 @@ void ofApp::mouseReleased(int x, int y, int button)
     std::vector< std::vector<scrib::point_info> *> * shapes_new  = segmenter_fast.FindFaces(&points);
     std::vector< std::vector<scrib::point_info> *> * shapes_new2 = segmenter_brute.FindFaces(&points);
 
+    scrib::OffsetCurves offsetter;
+    shapes_new -> clear();
+
+    for(int i = 20; i < 300; i += 20)
+    {
+        shapes_new -> push_back(offsetter.computeOffsetCurve(&points, i));
+    }
+
+
     mutex.lock();
     shapes = shapes_new;
     mutex.unlock();
 
     cout<< "Rebuilt Scribble" << endl;
     cout << shapes_new2->size() << " Brute Cycles!" << endl;
-    cout << shapes->size() << " Fast Algo Cycles!" << endl;
+    cout << shapes -> size() << " Fast Algo Cycles!" << endl;
     cout << "Size = " << points.size() << endl;
 
     num = 0;
