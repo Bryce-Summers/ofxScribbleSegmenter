@@ -1534,10 +1534,10 @@
 
 1410271394 source:c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\ofxscribblesegmenter\icon.rc
 
-1455948303 source:c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\ofxscribblesegmenter\src\facefinder.cpp
+1455955053 source:c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\ofxscribblesegmenter\src\facefinder.cpp
 	"../include/FaceFinder.h"
 
-1455954554 c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\ofxscribblesegmenter\include\facefinder.h
+1455955053 c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\ofxscribblesegmenter\include\facefinder.h
 	<vector>
 	"ofMain.h"
 	"Line.h"
@@ -1570,7 +1570,7 @@
 1455954065 source:c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\ofxscribblesegmenter\example\ofapp.cpp
 	"ofApp.h"
 
-1455952981 c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\ofxscribblesegmenter\example\ofapp.h
+1455955053 c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\ofxscribblesegmenter\example\ofapp.h
 	"ofMain.h"
 	"../include/FaceFinder.h"
 	"../include/OffsetCurves.h"
@@ -1579,7 +1579,7 @@
 	"ofMain.h"
 	"ofApp.h"
 
-1455954595 c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\ofxscribblesegmenter\include\offsetcurves.h
+1455955053 c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\ofxscribblesegmenter\include\offsetcurves.h
 	<vector>
 	"ofMain.h"
 	"Line.h"
@@ -1587,9 +1587,12 @@
 	"FaceFinder.h"
 	"CurveFunctions.h"
 
-1455952893 source:c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\ofxscribblesegmenter\src\offsetcurves.cpp
+1455955053 source:c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\ofxscribblesegmenter\src\offsetcurves.cpp
 	"OffsetCurves.h"
 
-1455954678 c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\ofxscribblesegmenter\include\curvefunctions.h
+1455955053 c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\ofxscribblesegmenter\include\curvefunctions.h
 	"ofMain.h"
+
+1455955053 source:c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\ofxscribblesegmenter\src\curvefunctions.cpp
+	"CurveFunctions.h"
 

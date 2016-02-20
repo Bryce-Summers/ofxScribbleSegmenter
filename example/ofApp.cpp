@@ -216,7 +216,7 @@ void ofApp::mouseReleased(int x, int y, int button)
 {
 
     std::vector< std::vector<scrib::point_info> *> * shapes_new  = segmenter_fast.FindFaces(&points);
-    std::vector< std::vector<scrib::point_info> *> * shapes_new2 = segmenter_brute.FindFaces(&points);
+    //std::vector< std::vector<scrib::point_info> *> * shapes_new2 = segmenter_brute.FindFaces(&points);
 
     scrib::OffsetCurves offsetter;
     shapes_new -> clear();
@@ -232,7 +232,7 @@ void ofApp::mouseReleased(int x, int y, int button)
     mutex.unlock();
 
     cout<< "Rebuilt Scribble" << endl;
-    cout << shapes_new2->size() << " Brute Cycles!" << endl;
+    //cout << shapes_new2->size() << " Brute Cycles!" << endl;
     cout << shapes -> size() << " Fast Algo Cycles!" << endl;
     cout << "Size = " << points.size() << endl;
 
