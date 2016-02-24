@@ -98,24 +98,15 @@ void ofApp::draw(){
         return;
     }
 
-    //ofFill();
     ofSetColor(ofColor::red);
+    ofFill();
 
-    mutex.lock();
-
-    // -- Draw a particular region.
+    // Draw all of the faces.
+    // Draw the face with index 'num' as filled.
     int len = shapes -> size();
 
-    int i = num;
     for(int i = 0; i < len; i++)
-    //if(i >= 0 && i < len)
     {
-        /*
-        if(i != num)
-        {
-            continue;
-        }
-        */
 
         std::vector<scrib::point_info> * points = shapes -> at(i);
 
@@ -134,15 +125,12 @@ void ofApp::draw(){
             p.lineTo(pt.x, pt.y);
         }
 
-        p.setFilled(false);
+        p.setFilled(i == num);
         p.close();
         p.draw();
     }
 
-    mutex.unlock();
-
     // -- Draw the entire scribble.
-
     drawPath(points);
     drawPath(points_2);
 
@@ -200,7 +188,16 @@ void ofApp::mouseMoved(int x, int y ){
 //--------------------------------------------------------------
 void ofApp::mouseDragged(int x, int y, int button){
 
-    points.push_back(ofPoint(x, y));
+    last_point;
+
+    ofPoint point_new = ofPoint(x, y);
+
+    if(points.size() == 0 || last_point.distance(point_new) > 10.0)
+    {
+        points.push_back(point_new);
+        last_point = point_new;
+    }
+
 }
 
 //--------------------------------------------------------------
@@ -214,25 +211,15 @@ void ofApp::mousePressed(int x, int y, int button){
 //--------------------------------------------------------------
 void ofApp::mouseReleased(int x, int y, int button)
 {
-
+    // The fast solver is pretty fast...
     std::vector< std::vector<scrib::point_info> *> * shapes_new  = segmenter_fast.FindFaces(&points);
-    //std::vector< std::vector<scrib::point_info> *> * shapes_new2 = segmenter_brute.FindFaces(&points);
+    // The brute solver is very slow...
+    std::vector< std::vector<scrib::point_info> *> * shapes_new2 = segmenter_brute.FindFaces(&points);
 
-    scrib::OffsetCurves offsetter;
-    shapes_new -> clear();
-
-    for(int i = 20; i < 300; i += 20)
-    {
-        shapes_new -> push_back(offsetter.computeOffsetCurve(&points, i));
-    }
-
-
-    mutex.lock();
     shapes = shapes_new;
-    mutex.unlock();
 
     cout<< "Rebuilt Scribble" << endl;
-    //cout << shapes_new2->size() << " Brute Cycles!" << endl;
+    cout << shapes_new2->size() << " Brute Cycles!" << endl;
     cout << shapes -> size() << " Fast Algo Cycles!" << endl;
     cout << "Size = " << points.size() << endl;
 

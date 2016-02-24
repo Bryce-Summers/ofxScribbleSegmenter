@@ -19,6 +19,7 @@ namespace scrib{
 class FaceFinder
 {
     public:
+
         FaceFinder(bool useFastAlgo = true)
         {
             bUseFastAlgo = useFastAlgo;
@@ -55,6 +56,7 @@ class FaceFinder
     protected:
     private:
 
+        inline std::vector<std::vector<point_info> *> * trivial(std::vector<ofPoint> * inputs);
         inline std::vector<std::vector<point_info> *> * do_the_rest();
 
         bool bUseFastAlgo;

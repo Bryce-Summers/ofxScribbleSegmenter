@@ -32,10 +32,35 @@ std::vector< std::vector<point_info> *> * FaceFinder::FindFaces(std::vector< std
 
 std::vector< std::vector<point_info> *> * FaceFinder::FindFaces(std::vector<ofPoint> * inputs)
 {
+    // Handle Trivial Input.
+    if(inputs -> size() <= 1)
+    {
+        return trivial(inputs);
+    }
+
     // Make sure that the previous data is cleared.
     loadInput(inputs);
 
     return do_the_rest();
+}
+
+inline std::vector<std::vector<point_info> *> * FaceFinder::trivial(std::vector<ofPoint> * inputs)
+{
+    std::vector< std::vector<point_info> *> * output = new std::vector< std::vector<point_info> *>();
+
+    if(inputs -> size() < 1)
+    {
+        return output; // Trivial empty array.
+    }
+
+    // 1 point face.
+    std::vector<point_info> * face = new std::vector<point_info>();
+
+    // Create the one point.
+    face -> push_back(point_info(inputs->at(0), 0));
+
+    output -> push_back(face);
+    return output;
 }
 
 inline std::vector<std::vector<point_info> *> * FaceFinder::do_the_rest()

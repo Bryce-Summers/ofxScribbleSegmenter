@@ -15,6 +15,30 @@ OffsetCurves::~OffsetCurves()
 
 std::vector<scrib::point_info> * OffsetCurves::computeOffsetCurve(std::vector<ofPoint> * input, double dist)
 {
+    cout << input -> size() << endl;
+
+    if(input->size() == 0)
+    {
+        std::vector<scrib::point_info> * trivial_output = new std::vector<scrib::point_info>();
+        return trivial_output;
+    }
+
+    if(input->size() == 1)
+    {
+        std::vector<scrib::point_info> * circle_output = new std::vector<scrib::point_info>();
+
+        cout << "size1" << endl;
+
+        int len = 3;
+        for(int i = 0; i < 3; i++)
+        {
+            circle_output -> push_back(point_info(ofPoint(dist*cos(i/(PI*2)), dist*sin(i/(PI*2))), i));
+        }
+
+
+        return circle_output;
+    }
+
     if(scrib::computeAreaOfPolygon(input) > 0)
     {
         dist *= -1;

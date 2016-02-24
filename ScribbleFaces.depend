@@ -1534,10 +1534,10 @@
 
 1410271394 source:c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\ofxscribblesegmenter\icon.rc
 
-1455955053 source:c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\ofxscribblesegmenter\src\facefinder.cpp
+1456354823 source:c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\ofxscribblesegmenter\src\facefinder.cpp
 	"../include/FaceFinder.h"
 
-1455955053 c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\ofxscribblesegmenter\include\facefinder.h
+1456354782 c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\ofxscribblesegmenter\include\facefinder.h
 	<vector>
 	"ofMain.h"
 	"Line.h"
@@ -1567,10 +1567,10 @@
 	"ofMain.h"
 	"ofApp.h"
 
-1455954065 source:c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\ofxscribblesegmenter\example\ofapp.cpp
+1456354085 source:c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\ofxscribblesegmenter\example\ofapp.cpp
 	"ofApp.h"
 
-1455955053 c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\ofxscribblesegmenter\example\ofapp.h
+1456357517 c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\ofxscribblesegmenter\example\ofapp.h
 	"ofMain.h"
 	"../include/FaceFinder.h"
 	"../include/OffsetCurves.h"
@@ -1587,7 +1587,7 @@
 	"FaceFinder.h"
 	"CurveFunctions.h"
 
-1455955053 source:c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\ofxscribblesegmenter\src\offsetcurves.cpp
+1456165215 source:c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\ofxscribblesegmenter\src\offsetcurves.cpp
 	"OffsetCurves.h"
 
 1455955053 c:\users\bryce\desktop\golan\of_v0.8.4_win_cb_release\apps\myapps\ofxscribblesegmenter\include\curvefunctions.h
