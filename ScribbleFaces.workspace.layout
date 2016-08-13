@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_workspace_layout_file>
-	<ActiveProject path="ScribbleFaces.cbp" />
-	<PreferredTarget name="debug" />
+	<ActiveProject path="../../../libs/openFrameworksCompiled/project/win_cb/openFrameworksLib.cbp" />
 </CodeBlocks_workspace_layout_file>

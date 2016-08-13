@@ -5,6 +5,8 @@ void ofApp::setup(){
 
     num = 0;
 
+    bool display_input_polyline = true;
+
     // These lists of points represent square-ish shapes.
     /*  |
      * -+-----.
@@ -41,7 +43,7 @@ void ofApp::setup(){
     //shapes = segmenter_fast.FindFaces(&points);
     //shapes = segmenter_brute.FindFaces(&points);
 
-    segmenter_fast.setClosed(true);
+    //segmenter_fast.setClosed(true);
 
     // -- Use these function calls to compute the faces when the
     //    plane is segmented by both polylines.
@@ -110,6 +112,12 @@ void ofApp::draw(){
 
         std::vector<scrib::point_info> * points = shapes -> at(i);
 
+        // If the face is of trivial size.
+        if (points -> size() < 1)
+        {
+            continue;
+        }
+
         int len2 = points->size();
 
         ofPath p = ofPath();
@@ -131,8 +139,14 @@ void ofApp::draw(){
     }
 
     // -- Draw the entire scribble.
-    drawPath(points);
-    drawPath(points_2);
+
+    if(display_input_polyline)
+    {
+        drawPath(points);
+    }
+
+    //drawPath(points_2);
+
 
     ofDrawBitmapString("Press 'A' and 'D' to cycle left and right through the faces.", 20, 170);
     ofDrawBitmapString("Click and drag the mouse in a wild pattern, then release to test new scribbles!", 20, 200);
@@ -158,6 +172,11 @@ void ofApp::drawPath(vector<ofPoint> &points)
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
+
+    if(shapes->size() < 1)
+    {
+        return;
+    }
 
     if(key == 'd')
     {
@@ -206,24 +225,30 @@ void ofApp::mousePressed(int x, int y, int button){
     num = -1;
     points.clear();
     points_2.clear();
+    display_input_polyline = true;
 }
 
 //--------------------------------------------------------------
 void ofApp::mouseReleased(int x, int y, int button)
 {
     // The fast solver is pretty fast...
-    std::vector< std::vector<scrib::point_info> *> * shapes_new  = segmenter_fast.FindFaces(&points);
-    // The brute solver is very slow...
-    std::vector< std::vector<scrib::point_info> *> * shapes_new2 = segmenter_brute.FindFaces(&points);
+    std::vector< std::vector<scrib::point_info> *> * shapes_new_raw  = segmenter_fast.FindFaces(&points);
 
-    shapes = shapes_new;
+    std::vector< std::vector<scrib::point_info> *> * shapes_clipped_tails = segmenter_fast.clipTails(shapes_new_raw);
+
+    // The brute solver is very slow...
+    //std::vector< std::vector<scrib::point_info> *> * shapes_new2 = segmenter_brute.FindFaces(&points);
+
+    shapes = shapes_clipped_tails;
 
     cout<< "Rebuilt Scribble" << endl;
-    cout << shapes_new2->size() << " Brute Cycles!" << endl;
+    //cout << shapes_new2->size() << " Brute Cycles!" << endl;
     cout << shapes -> size() << " Fast Algo Cycles!" << endl;
     cout << "Size = " << points.size() << endl;
 
     num = 0;
+
+    display_input_polyline = false;
 }
 
 //--------------------------------------------------------------

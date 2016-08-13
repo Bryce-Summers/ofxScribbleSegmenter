@@ -1,7 +1,8 @@
 #ifndef FACEFINDER_H
 #define FACEFINDER_H
 
-/* Finds Face regions from a given contiguous polyline.
+/*
+ * Finds Face regions from a given contiguous polyline.
  *
  * Written by Bryce Summers.
  * 6/26/2015.
@@ -20,6 +21,9 @@ class FaceFinder
 {
     public:
 
+        // A User can explicitly pass false to force the intersection points to be found using a brute force algorithm that
+        // may potentially be more robust and reliable than the optimized intersection algorithm,
+        // but it kills the performance.
         FaceFinder(bool useFastAlgo = true)
         {
             bUseFastAlgo = useFastAlgo;
@@ -27,8 +31,39 @@ class FaceFinder
         };
         virtual ~FaceFinder(){};
 
+
+        /* -- Here is the interface for calling the built in algorithms for the Scribble segmenter.
+         * These algorithms include:
+         * Preprocessing:
+         * [EMPTY]
+         *
+         * Main Algorithm:
+         * 1. The main algorithm for embedding a set of polylines in space and determining the set of non chordal cycles in the
+         *    associated embedded planar graph.
+         *
+         * - A polygon is closed if it has identical starting and ending points and open otherwise.
+         *   The algorithm may be configured to output either open or closed polygons based on the closed_loop mode state.
+         *
+         * FIXME: If a user draws a second line completely around an original line, then their will be faces defined by both an external
+         *        face on the original polyline embedding and an internal face on the new enclosing embedding.
+         *        This may invalidate some users' assumptions of a global planar graph embedding without any holes.
+         *
+         * Post Processing:
+         * 1. Determine internal and external faces. (Initial Release)
+         * 2. Determine trivial and non trivial area faces according to a constant area threshold value. (8/11/2016)
+         *    (If you can't think of any good constant values, you might want to look at the field of
+         *     Topological Data Analysis and their 'barcode' concept: https://en.wikipedia.org/wiki/Topological_data_analysis.
+         * 3. Clipping off tails, i.e. portions of faces that enclose 0 area. (8/11/2016)
+         *    This could potentially be put into the getCycle function, but I think that it is best to make this a dedicated post processing step instead
+         *    in order to preserve the simplicity of the main algorithm.
+         *    This algorithm properly handles faces with either duplicated or non-duplicated starting and ending points.
+         *    i.e. Those produced in open and closed mode.
+         */
+
+
+
         // Derive faces from a single polyline input.
-        // No gurrantee is made about the order of the polygons.
+        // No guarantee is made about the order of the polygons.
         // The Output is a list of sub polygons.
         // All of the points given as inputs to this algorithm will be treated as if they were distinct.
         // The points will also be randomly offset by a 'small' amount to prevent the existence of vertical lines.
@@ -37,16 +72,32 @@ class FaceFinder
         point_info // Information about the point.
         > *> * FindFaces(std::vector<ofPoint> * inputs);
 
-        // Derive faces from a set list of vertice disjoint polyline inputs.
+        // Derive faces from a set list of vertex disjoint polyline inputs.
         std::vector< // List of Polygons.
         std::vector< // Each polygon is a list of points.
         point_info // Information about the Point.
         > *> * FindFaces(std::vector< std::vector<ofPoint> *> * inputs);
 
+        // -- Post processing algorithms.
+
         // Appends the indices of any external faces amongst the input list of faces to the output vector.
         // NOTE : The input type is equivelant to the output type of the face finding functions,
         // so using this function may be a natural extension of using the original functions.
         void determineExternalFaces(std::vector<std::vector<point_info> *> * input, std::vector<int> * output);
+
+        // Appends to output the indices of the faces of **NonTrivial** Area (area >= min_area)
+        void determineNonTrivialAreaFaces(std::vector<std::vector<point_info> *> * input, std::vector<int> * output, float min_area);
+        // Appends to output the indices of the faces of **Trivial** Area (area < min_area)
+        void determineTrivialAreaFaces(std::vector<std::vector<point_info> *> * input, std::vector<int> * output, float min_area);
+
+        // Input: a set of faces, Output: a new set of faces that have no trivial contiguous subfaces.
+        // ENSURES: Polygons will be output either open or closed in the manner that they are passed in.
+        // ENSURES: Omits faces consisting of only a single long tail.
+        std::vector<std::vector<point_info> *> * clipTails(std::vector<std::vector<point_info> *> * input);
+
+        // Returns a copy of the single input face without any trivial area contiguous subfaces. (Tails)
+        // May return a 0 point polyline if the input line is non-intersecting.
+        std::vector<point_info> * clipTails(std::vector<point_info> * input);
 
         // Tells this face finder to interpret the input curve as a line if open and a closed loop if closed.
         // If close, it will consider endpoints as attached to each other.
@@ -56,6 +107,7 @@ class FaceFinder
     protected:
     private:
 
+        // The trivial function constructs the proper output for input polylines of size 1 or 0.
         inline std::vector<std::vector<point_info> *> * trivial(std::vector<ofPoint> * inputs);
         inline std::vector<std::vector<point_info> *> * do_the_rest();
 
@@ -129,6 +181,7 @@ class FaceFinder
         // true  --> do not process this edge again, it is already in an output cycle.
         // false --> proccess this edge, it is part of a cycle that has not yet been output.
         std::map<int, std::vector<bool> *> output_predicate;
+
 };
 
 }

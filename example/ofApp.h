@@ -29,6 +29,8 @@ class ofApp : public ofBaseApp{
 
         ofPoint last_point;
 
+        bool display_input_polyline;
+
         std::vector< std::vector<scrib::point_info> *> * shapes;
 
 
