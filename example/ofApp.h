@@ -1,8 +1,8 @@
 #pragma once
 
 #include "ofMain.h"
-#include "../include/FaceFinder.h"
-#include "../include/OffsetCurves.h"
+#include "../src/FaceFinder.h"
+#include "../src/OffsetCurves.h"
 
 class ofApp : public ofBaseApp{
 

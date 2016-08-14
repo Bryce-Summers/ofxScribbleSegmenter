@@ -1,0 +1,57 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="src\CurveFunctions.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\FaceFinder.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Intersector.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Line.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\OffsetCurves.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="example\main.cpp">
+      <Filter>example</Filter>
+    </ClCompile>
+    <ClCompile Include="example\ofApp.cpp">
+      <Filter>example</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="src">
+      <UniqueIdentifier>{d8376475-7454-4a24-b08a-aac121d3ad6f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="example">
+      <UniqueIdentifier>{40514439-68d3-4908-9f33-71abcf60891e}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\CurveFunctions.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\FaceFinder.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Intersector.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Line.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\OffsetCurves.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="example\ofApp.h">
+      <Filter>example</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="icon.rc" />
+  </ItemGroup>
+</Project>

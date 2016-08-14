@@ -1,4 +1,4 @@
-#include "../include/Line.h"
+#include "Line.h"
 
 namespace scrib{
 

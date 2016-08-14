@@ -9,7 +9,7 @@
 
 #include <iostream>
 #include <math.h>
-#include "../include/Intersector.h"
+#include "Intersector.h"
 
 namespace scrib{
 

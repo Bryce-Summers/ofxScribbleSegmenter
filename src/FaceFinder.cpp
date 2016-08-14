@@ -1,4 +1,4 @@
-#include "../include/FaceFinder.h"
+#include "FaceFinder.h"
 
 /*
 FaceFinder::FaceFinder()
