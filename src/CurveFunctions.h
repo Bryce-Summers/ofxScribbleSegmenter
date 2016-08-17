@@ -2,27 +2,10 @@
 #define CURVEFUNCTIONS_H
 
 // Standard functions and classes in the scrib namespace.
-
 #include "ofMain.h"
 
 namespace scrib
 {
-
-    class point_info
-    {
-    public :
-
-        // -- Constructor.
-        point_info(ofPoint p, int id)
-        {
-            point = p;
-            ID = id;
-        }
-
-        ofPoint point;
-        int ID;
-    };
-
     /*
      * http://math.blogoverflow.com/2014/06/04/greens-theorem-and-area-of-polygons/
      * Computes the area of a 2D polygon directly from the polygon's coordinates.

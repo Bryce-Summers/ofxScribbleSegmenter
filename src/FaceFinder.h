@@ -2,10 +2,13 @@
 #define FACEFINDER_H
 
 /*
- * Finds Face regions from a given contiguous polyline.
+ * Transforms a set of input polylines into a planar graph embedding.
  *
  * Written by Bryce Summers.
- * 6/26/2015.
+ * 6/26/2015: Wrote Original.
+ * 8/16/2016: Rewrote as GraphEmbedder in order to output full graph embeddings using a half edge structure.
+ *
+ * Written for the STUDIO for Creative Inquiry at Carnegie Mellon University.
  */
 
 #include <vector>
@@ -13,6 +16,7 @@
 #include "Line.h"
 #include "Intersector.h"
 #include "CurveFunctions.h"
+#include "HalfedgeGraph.h"
 
 namespace scrib{
 
@@ -59,7 +63,6 @@ class FaceFinder
          *    This algorithm properly handles faces with either duplicated or non-duplicated starting and ending points.
          *    i.e. Those produced in open and closed mode.
          */
-
 
 
         // Derive faces from a single polyline input.

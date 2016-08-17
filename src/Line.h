@@ -30,6 +30,7 @@ class Line
 
         // Appends all of the split set of lines in order to the output vector.
         // Adds itself if it does not contain any split lines.
+		// Line pts are oriented along the polyline, such that p1 comes before p2 in the polyline + intersection point ordering.
         void getSplitLines(std::vector<Line> * lines_collector);
 
         // This function should only be called after a call to intersect has returned true.
