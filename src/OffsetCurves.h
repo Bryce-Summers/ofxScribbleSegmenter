@@ -6,7 +6,7 @@
 #include "Line.h"
 #include "Intersector.h"
 #include "FaceFinder.h"
-#include "CurveFunctions.h"
+
 
 /*
  * Offset Curve computer.

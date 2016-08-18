@@ -87,7 +87,7 @@ namespace scrib
 
 	void PolylineGraphPostProcessor::determineExternalFaces(std::vector<int> * output)
 	{
-		Face_Vector_Format * input = format_face_vectors;
+		Face_Vector_Format * input = face_vector;
 
 		int len = input->size();
 
@@ -104,7 +104,7 @@ namespace scrib
 
 	void PolylineGraphPostProcessor::determineNonTrivialAreaFaces(std::vector<int> * output, float min_area)
 	{
-		Face_Vector_Format * input = format_face_vectors;
+		Face_Vector_Format * input = face_vector;
 
 		int len = input->size();
 
@@ -124,7 +124,7 @@ namespace scrib
 
 	void PolylineGraphPostProcessor::determineTrivialAreaFaces(std::vector<int> * output, float min_area)
 	{
-		Face_Vector_Format * input = format_face_vectors;
+		Face_Vector_Format * input = face_vector;
 
 		int len = input->size();
 
@@ -144,7 +144,7 @@ namespace scrib
 
 	Face_Vector_Format * PolylineGraphPostProcessor::clipTails()
 	{
-		Face_Vector_Format * input  = format_face_vectors;
+		Face_Vector_Format * input  = face_vector;
 		Face_Vector_Format * output = new std::vector<std::vector<point_info> *>();
 
 		int len = input->size();

@@ -91,41 +91,10 @@ namespace scrib
 		// -- Public Interface.
 
 		// Allocation functions.
-		Face * newFace()
-		{
-			int ID = faces.size();
-			faces.push_back(Face());
-			Face * output = &faces[ID];
-			output -> ID = ID;
-			output -> data = new Face_Data();
-			return output;
-		}
-		Vertex * newVertex()
-		{
-			int ID = vertices.size();
-			vertices.push_back(Vertex());
-			Vertex * output = &vertices[ID];
-			output->ID = ID;
-			return output;
-		}
-
-		Edge * newEdge()
-		{
-			int ID = edges.size();
-			edges.push_back(Edge());
-			Edge * output = &edges[ID];
-			output->ID = ID;
-			return output;
-		}
-
-		Halfedge * newHalfedge()
-		{
-			int ID = halfedges.size();
-			halfedges.push_back(Halfedge());
-			Halfedge * output = &halfedges[ID];
-			output->ID = ID;
-			return output;
-		}
+		Face     * newFace();
+		Vertex   * newVertex();
+		Edge     * newEdge();
+		Halfedge * newHalfedge();
 
 		// Accessing functions. We keep this interface, because then we only have to guranteed that the this.get(element.ID) = element.
 		// We could even change the internal structure to a non contiguous lookup and the interface would be preserved.

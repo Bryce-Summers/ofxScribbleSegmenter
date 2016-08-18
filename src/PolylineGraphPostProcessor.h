@@ -62,7 +62,7 @@ namespace scrib
 	{
 
 	public:
-		PolylineGraphPostProcessor(Graph * graph)
+		PolylineGraphPostProcessor(Graph * graph = NULL)
 		{
 			this->graph = graph;
 		}
@@ -88,6 +88,11 @@ namespace scrib
 		void load_face_vector(Face_Vector_Format * face_vector_format)
 		{
 			this -> face_vector = face_vector_format;
+		}
+
+		void load_graph(Graph * graph)
+		{
+			this -> graph = graph;
 		}
 
 

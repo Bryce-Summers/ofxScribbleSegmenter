@@ -92,8 +92,11 @@ std::vector<scrib::point_info> * OffsetCurves::computeExterior(std::vector<ofPoi
     std::vector< std::vector<scrib::point_info> *> * faces;
     faces = segmenter.FindFaces(input);
 
+	PolylineGraphPostProcessor post;
+	post.load_face_vector(faces);
+
     std::vector<int> external_face_indices;
-    segmenter.determineExternalFaces(faces, &external_face_indices);
+    post.determineExternalFaces(&external_face_indices);
 
     // Get the index of the 1 external face.
     int output_index = external_face_indices[0];
