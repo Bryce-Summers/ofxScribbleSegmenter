@@ -12,6 +12,13 @@
  *
  * Allows users to convert Planar Polyline Embedded Graphs into mainstream C++ data structures.
  * This class then provides some useful processing algorithms on these output structures.
+ *
+ * I may also put information extraction algorithms here.
+ * 
+ * The key idea is that the post processor doesn't mutate the Graph object in any way.
+ * FIXME: Use the Graph Mutator Proccessor instead (Currenly non existant.) if you wish to modify the graph.
+ *
+ * Maybe I will make a modification mode.
  */
 
 namespace scrib

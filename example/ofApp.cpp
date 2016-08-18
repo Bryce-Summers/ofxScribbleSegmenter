@@ -7,7 +7,7 @@ void ofApp::setup(){
 
     bool display_input_polyline = true;
 
-    // These lists of points represent square-ish shapes.
+    // These initial example lists of points represent square-ish shapes.
     /*  |
      * -+-----.
      *  |     |
@@ -35,36 +35,24 @@ void ofApp::setup(){
     input.push_back(&points);
     input.push_back(&points_2);
 
-    std::vector< std::vector<ofPoint> *> * faces;
-
-
-    // -- Use these function calls to compute the faces for
-    //    either of the polylines by themeselves.
-    //shapes = segmenter_fast.FindFaces(&points);
-    //shapes = segmenter_brute.FindFaces(&points);
-
-    //segmenter_fast.setClosed(true);
-
-    // -- Use these function calls to compute the faces when the
-    //    plane is segmented by both polylines.
-    shapes = segmenter_fast.FindFaces(&input);
-    //shapes = segmenter_brute.FindFaces(&input);
+	// Compute the initial graph embedding.
+	computeEmbedding();
 
     external_face_indices.clear();
 
-	post_proccessor.load_face_vector(shapes);
-    post_proccessor.determineExternalFaces(&external_face_indices);
+	post_processor.load_face_vector(faces);
+    post_processor.determineExternalFaces(&external_face_indices);
 
 
     cout << "setup done!" << endl;
-    cout << shapes->size() << " Cycles!" << endl;
+    cout << faces->size() << " Cycles!" << endl;
     cout << "There is/are " << external_face_indices.size() << " external faces with ";
 
     int len = external_face_indices.size();
     for(int i = 0; i < len; i++)
     {
         int shapes_index = external_face_indices[i];
-        int polygon_size = shapes -> at(shapes_index) -> size();
+        int polygon_size = faces -> at(shapes_index) -> size();
         cout << polygon_size << ", ";
     }
 
@@ -72,10 +60,10 @@ void ofApp::setup(){
 
     cout << "\n Information about all of the polygons: \n" << endl;
 
-    len = shapes -> size();
+    len = faces -> size();
     for(int i = 0; i < len; i++)
     {
-        std::vector<scrib::point_info> * polygon = shapes->at(i);
+        std::vector<scrib::point_info> * polygon = faces->at(i);
         int polygon_len = polygon -> size();
 
         cout << "Polygon " << i << endl;
@@ -84,7 +72,7 @@ void ofApp::setup(){
         {
             scrib::point_info p_info = polygon -> at(j);
             cout << " --Point : " << p_info.point <<
-                    ", index = " << p_info.ID << endl;
+                    ", index = "  << p_info.ID << endl;
         }
     }
 }
@@ -97,7 +85,7 @@ void ofApp::update(){
 //--------------------------------------------------------------
 void ofApp::draw(){
 
-    if(shapes == NULL)
+    if(faces == NULL)
     {
         return;
     }
@@ -107,12 +95,12 @@ void ofApp::draw(){
 
     // Draw all of the faces.
     // Draw the face with index 'num' as filled.
-    int len = shapes -> size();
+    int len = faces -> size();
 
     for(int i = 0; i < len; i++)
     {
 
-        std::vector<scrib::point_info> * points = shapes -> at(i);
+        std::vector<scrib::point_info> * points = faces -> at(i);
 
         // If the face is of trivial size.
         if (points -> size() < 1)
@@ -162,6 +150,12 @@ void ofApp::drawPath(vector<ofPoint> &points)
     p3.setStrokeWidth(1);
 
     int len = points.size();
+
+	if (len == 0)
+	{
+		return;
+	}
+
     p3.moveTo(points[0]);
     for(int i = 1; i < len; i++)
     {
@@ -175,7 +169,7 @@ void ofApp::drawPath(vector<ofPoint> &points)
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
 
-    if(shapes->size() < 1)
+    if(faces->size() < 1)
     {
         return;
     }
@@ -183,14 +177,14 @@ void ofApp::keyPressed(int key){
     if(key == 'd')
     {
         // Increment mod len.
-        int len = shapes->size();
+        int len = faces->size();
         num = (num + 1) % len;
     }
 
     if(key == 'a')
     {
         // Decrement mod len.
-        int len = shapes->size();
+        int len = faces->size();
         num = (num + len - 1) % len;
     }
 
@@ -231,27 +225,57 @@ void ofApp::mousePressed(int x, int y, int button){
 }
 
 //--------------------------------------------------------------
+
 void ofApp::mouseReleased(int x, int y, int button)
 {
-    // The fast solver is pretty fast...
-    std::vector< std::vector<scrib::point_info> *> * shapes_new_raw  = segmenter_fast.FindFaces(&points);
+	computeEmbedding();
+	num = 0;
+	display_input_polyline = false;
+}
 
-	post_proccessor.load_face_vector(shapes_new_raw);
-    std::vector< std::vector<scrib::point_info> *> * shapes_clipped_tails = post_proccessor.clipTails();
+void ofApp::computeEmbedding()
+{
+	// Raw face_vector embedding.
+	// Allocated and deallocated withing this method.
+	scrib::Face_Vector_Format * face_vector;
 
-    // The brute solver is very slow...
-    //std::vector< std::vector<scrib::point_info> *> * shapes_new2 = segmenter_brute.FindFaces(&points);
+	switch (use_embedder)
+	{
+		case FACE_FINDER:
+			face_vector = processUsingFaceFinder();
+			return;
+		case POLYLINE_GRAPH_EMBEDDER:
+			face_vector = processUsingGraphEmbedder();
+	}
 
-    shapes = shapes_clipped_tails;
+	post_processor.load_face_vector(face_vector);
+	this -> faces = post_processor.clipTails();
+	delete face_vector;
 
-    cout<< "Rebuilt Scribble" << endl;
-    //cout << shapes_new2->size() << " Brute Cycles!" << endl;
-    cout << shapes -> size() << " Fast Algo Cycles!" << endl;
-    cout << "Size = " << points.size() << endl;
+	cout << faces -> size()      << " faces found." << endl;
+	cout << "Number of Points = " << points.size()   << endl;
 
-    num = 0;
+}
 
-    display_input_polyline = false;
+// Derives a face vector using the FaceFinder.
+scrib::Face_Vector_Format * ofApp::processUsingFaceFinder()
+{
+	// The fast solver is pretty fast...
+	scrib::Face_Vector_Format * face_vector = segmenter_fast.FindFaces(&points);
+
+	cout << "Rebuilt Scribble Using Face Finder" << endl;
+	return face_vector;
+}
+
+scrib::Face_Vector_Format * ofApp::processUsingGraphEmbedder()
+{
+	scrib::Graph * graph      = polyline_embedder.embedPolyline(&points);
+	post_processor.load_graph(graph);
+	scrib::Face_Vector_Format * face_vector = post_processor.convert_to_face_vectors();
+	
+	cout << "Rebuilt Scribble Using PolylineGraphEmbedder" << endl;
+
+	return face_vector;
 }
 
 //--------------------------------------------------------------

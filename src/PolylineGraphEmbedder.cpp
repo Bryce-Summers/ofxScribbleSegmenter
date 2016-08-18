@@ -7,6 +7,8 @@ namespace scrib {
         closed_loop = isClosed;
     }
 
+	// FIXME: Allow for the embedding of multiple trivial subgraphs.
+
     Graph * PolylineGraphEmbedder::embedPolylineSet(std::vector< std::vector<ofPoint> *> * inputs)
     {
         // Make sure that the previous data is cleared.
@@ -35,18 +37,18 @@ namespace scrib {
 
     inline Graph * PolylineGraphEmbedder::trivial(std::vector<ofPoint> * inputs)
     {
-        Graph * output = new Graph();
+        graph = new Graph();
 
-        if (inputs->size() < 1)
+        if (inputs -> size() < 1)
         {
-            return output; // Trivial empty Graph.
+            return graph; // Trivial empty Graph.
         }
 
         // 1 point Graph.
         
         // We construct one of each element for the singleton graph.
         // NOTE: This allocation is a wrapper on top of the Graph allocation function, which allocates its Vertex_Data object.
-        //       the other functions this->new[____] work in the same way.
+        //       the other functions this->new[ ____ ] work in the same way.
         Vertex * vertex = newVertex();
 		Vertex_Data * vertex_data = vertex -> data;
         Edge * edge     = newEdge();
@@ -86,6 +88,8 @@ namespace scrib {
         twin -> prev   = twin;
         twin -> twin   = halfedge;
         twin -> vertex = vertex;
+		
+		return graph;
     }
 
     void PolylineGraphEmbedder::loadInput(std::vector<ofPoint> * inputs)
@@ -191,7 +195,6 @@ namespace scrib {
         }
 
         // -- Allocate 2 halfedges and 1 full edge for ever line in the split input.
-        std::vector<scrib::Line> lines_split;
         len = lines_split.size();
         for (int i = 0; i < len; i++)
         {
@@ -394,7 +397,6 @@ namespace scrib {
 		}
 	}
 
-
     Graph * PolylineGraphEmbedder::deriveFaces()
     {
 
@@ -432,6 +434,7 @@ namespace scrib {
 		do
 		{
 			current -> face = face;
+			current -> data -> marked = true;
 			current = current -> next;
 		} while (current != start);
 	}

@@ -20,7 +20,7 @@ namespace scrib
 
 		Graph_Data(Graph * graph)
 		{
-			this->graph = graph;
+			this -> graph = graph;
 		}
 	};
 

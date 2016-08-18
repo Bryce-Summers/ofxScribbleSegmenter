@@ -1,10 +1,30 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="src\CurveFunctions.cpp">
-      <Filter>src</Filter>
+    <ResourceCompile Include="icon.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="src">
+      <UniqueIdentifier>{9a6d3ee7-09d5-4da0-96e4-6ab6e8e02d64}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Example">
+      <UniqueIdentifier>{25ed3758-bcaa-4a01-a0b0-e33c76bd2c5b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\PolylineGraphs">
+      <UniqueIdentifier>{b799d60c-6384-44d4-8f19-fe9e6f4d3c23}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="example\main.cpp">
+      <Filter>Example</Filter>
+    </ClCompile>
+    <ClCompile Include="example\ofApp.cpp">
+      <Filter>Example</Filter>
     </ClCompile>
     <ClCompile Include="src\FaceFinder.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\HalfedgeGraph.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\Intersector.cpp">
@@ -16,26 +36,21 @@
     <ClCompile Include="src\OffsetCurves.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="example\main.cpp">
-      <Filter>example</Filter>
+    <ClCompile Include="src\PolylineGraphEmbedder.cpp">
+      <Filter>src\PolylineGraphs</Filter>
     </ClCompile>
-    <ClCompile Include="example\ofApp.cpp">
-      <Filter>example</Filter>
+    <ClCompile Include="src\PolylineGraphPostProcessor.cpp">
+      <Filter>src\PolylineGraphs</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Filter Include="src">
-      <UniqueIdentifier>{d8376475-7454-4a24-b08a-aac121d3ad6f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="example">
-      <UniqueIdentifier>{40514439-68d3-4908-9f33-71abcf60891e}</UniqueIdentifier>
-    </Filter>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="src\CurveFunctions.h">
-      <Filter>src</Filter>
+    <ClInclude Include="example\ofApp.h">
+      <Filter>Example</Filter>
     </ClInclude>
     <ClInclude Include="src\FaceFinder.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\HalfedgeGraph.h">
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="src\Intersector.h">
@@ -47,11 +62,17 @@
     <ClInclude Include="src\OffsetCurves.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="example\ofApp.h">
-      <Filter>example</Filter>
+    <ClInclude Include="src\PolylineGraphData.h">
+      <Filter>src\PolylineGraphs</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="icon.rc" />
+    <ClInclude Include="src\PolylineGraphEmbedder.h">
+      <Filter>src\PolylineGraphs</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PolylineGraphMain.h">
+      <Filter>src\PolylineGraphs</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PolylineGraphPostProcessor.h">
+      <Filter>src\PolylineGraphs</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
