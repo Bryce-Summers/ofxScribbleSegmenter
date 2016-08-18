@@ -64,25 +64,34 @@ namespace scrib
 	public:
 		PolylineGraphPostProcessor(Graph * graph)
 		{
-			format_graph = graph;
+			this->graph = graph;
 		}
 
 		virtual ~PolylineGraphPostProcessor() {}
 
 	private:
 		// Data.
-		Graph * format_graph;
+		Graph * graph;
 
 		// Face point vector format. // FIXME: Consider using smart pointers.
-		Face_Vector_Format * format_face_vectors;
+		Face_Vector_Format * face_vector = NULL;
 
 	public:
 
 		// -- Data Structure Conversion.
 		Face_Vector_Format * convert_to_face_vectors();
 
-		// -- Post processing algorithms.
 
+		// -- This class performs operations on face vectors, but it only uses the current face vector as an input.
+		// The class never changes the loaded face vector internally.
+		// It is up to the user to load the proper face vector when they need a change.
+		void load_face_vector(Face_Vector_Format * face_vector_format)
+		{
+			this -> face_vector = face_vector_format;
+		}
+
+
+		// -- Post processing algorithms.
 
 		// Appends the indices of any external faces amongst the input list of faces to the output vector.
 		// NOTE : The input type is equivelant to the output type of the face finding functions,

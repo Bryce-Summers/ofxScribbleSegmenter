@@ -50,6 +50,41 @@ namespace scrib
 		return area / 2.0;
 	}
 
+	Face_Vector_Format * PolylineGraphPostProcessor::convert_to_face_vectors()
+	{
+		Face_Vector_Format * output = new Face_Vector_Format();
+
+		Face_Iter start = graph -> facesBegin();
+		Face_Iter end   = graph -> facesEnd();
+
+		for (Face_Iter face = start; face != end; face++)
+		{
+			Point_Vector_Format * face_output = new Point_Vector_Format();
+
+			Halfedge * starting_half_edge = face -> halfedge;
+			Halfedge * current = starting_half_edge;
+
+			// Convert the entire face into point info objects.
+			do
+			{
+				Vertex * vert           = current -> vertex;
+				Vertex_Data * vert_data = vert -> data;
+
+				ofPoint point           = vert_data -> point;
+				int ID = vert -> ID;
+
+				face_output -> push_back(point_info(point, ID));
+
+				// Iterate.
+				current = current -> next;
+			} while (starting_half_edge != current);
+
+			output -> push_back(face_output);
+		}
+
+		return output;
+	}
+
 	void PolylineGraphPostProcessor::determineExternalFaces(std::vector<int> * output)
 	{
 		Face_Vector_Format * input = format_face_vectors;
