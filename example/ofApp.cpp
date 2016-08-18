@@ -51,7 +51,9 @@ void ofApp::setup(){
     //shapes = segmenter_brute.FindFaces(&input);
 
     external_face_indices.clear();
-    segmenter_fast.determineExternalFaces(shapes, &external_face_indices);
+
+	post_proccessor.load_face_vector(shapes);
+    post_proccessor.determineExternalFaces(&external_face_indices);
 
 
     cout << "setup done!" << endl;
@@ -234,7 +236,8 @@ void ofApp::mouseReleased(int x, int y, int button)
     // The fast solver is pretty fast...
     std::vector< std::vector<scrib::point_info> *> * shapes_new_raw  = segmenter_fast.FindFaces(&points);
 
-    std::vector< std::vector<scrib::point_info> *> * shapes_clipped_tails = segmenter_fast.clipTails(shapes_new_raw);
+	post_proccessor.load_face_vector(shapes_new_raw);
+    std::vector< std::vector<scrib::point_info> *> * shapes_clipped_tails = post_proccessor.clipTails();
 
     // The brute solver is very slow...
     //std::vector< std::vector<scrib::point_info> *> * shapes_new2 = segmenter_brute.FindFaces(&points);

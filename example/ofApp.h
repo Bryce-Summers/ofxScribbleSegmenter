@@ -3,6 +3,7 @@
 #include "ofMain.h"
 #include "../src/FaceFinder.h"
 #include "../src/OffsetCurves.h"
+#include "../src/PolylineGraphPostProcessor.h"
 
 class ofApp : public ofBaseApp{
 
@@ -36,6 +37,8 @@ class ofApp : public ofBaseApp{
 
         scrib::FaceFinder segmenter_fast  = scrib::FaceFinder();
         scrib::FaceFinder segmenter_brute = scrib::FaceFinder(false);
+
+		scrib::PolylineGraphPostProcessor post_proccessor = scrib::PolylineGraphPostProcessor(NULL);
 
         int num;
 
