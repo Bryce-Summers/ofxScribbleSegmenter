@@ -9,19 +9,19 @@
 
 
 /*
- * Offset Curve computer.
- * Written by Bryce Summers on 2/19/2016.
- * Purpose: For a given *closed* curve,
- *
- * this computes the curve defined by all points at a signed distance d away form the curve.
- *
- * Features: A solution to the problem through a reduction to the external face of the planar graph segmentation.
- */
+* Offset Curve computer.
+* Written by Bryce Summers on 2/19/2016.
+* Purpose: For a given *closed* curve,
+*
+* this computes the curve defined by all points at a signed distance d away form the curve.
+*
+* Features: A solution to the problem through a reduction to the external face of the planar graph segmentation.
+*/
 
-namespace scrib{
+namespace scrib {
 
-class OffsetCurves
-{
+    class OffsetCurves
+    {
     public:
         OffsetCurves();
         virtual ~OffsetCurves();
@@ -33,7 +33,7 @@ class OffsetCurves
         // Takes a closed loop and returns the closed loop cooresponding to its exterior.
         std::vector<scrib::point_info> * computeExterior(std::vector<ofPoint> * inputs);
 
-};
+    };
 
 }
 

@@ -1,12 +1,12 @@
 #pragma once
 
 /*
- * One Stop Include File.
- *
- * Written by Bryce Summers on 8/18/2016
- *
- * This header loads all of the necessary files for working with Polyline Graph Embeddings.
- */
+* One Stop Include File.
+*
+* Written by Bryce Summers on 8/18/2016
+*
+* This header loads all of the necessary files for working with Polyline Graph Embeddings.
+*/
 
 // Original Single Purpose Embedding and curve offsetting.
 #include "FaceFinder.h"

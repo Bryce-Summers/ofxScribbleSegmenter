@@ -3,207 +3,207 @@
 #include "ofMain.h"
 
 /*
- * Halfedge Graph / Mesh class.
- *
- * Written by Bryce Summers.
- *
- * 8/17/2016: Finished purely connectivist version with association.
- *
- * Usage:
- *
- * The Application programmer / New Media Artist specifies the following:
- * 1. The data format they have availible for graph construction (e.g. vectors of openframeworks points.)
- * 2. The Algorithms they need.
- * 3. The data format that they wish to receive the results in.
- *
- * The algorithm designer / computational geometer specifies the following:
- * 1. Definitions for the associated data.
- * 2. The interface for constructing Graphs from application data
- * 3. The interface for running algorithms on the Graphs.
- * 4. The interface for allowing the application programmer to retrieve the results.
- *
- * If done elegantly, the New Media Artist should never need to touch the halfedge mesh, go on pointer journeys, and 
- * they should be able to treat the internal implementation as a black box.
- */
+* Halfedge Graph / Mesh class.
+*
+* Written by Bryce Summers.
+*
+* 8/17/2016: Finished purely connectivist version with association.
+*
+* Usage:
+*
+* The Application programmer / New Media Artist specifies the following:
+* 1. The data format they have availible for graph construction (e.g. vectors of openframeworks points.)
+* 2. The Algorithms they need.
+* 3. The data format that they wish to receive the results in.
+*
+* The algorithm designer / computational geometer specifies the following:
+* 1. Definitions for the associated data.
+* 2. The interface for constructing Graphs from application data
+* 3. The interface for running algorithms on the Graphs.
+* 4. The interface for allowing the application programmer to retrieve the results.
+*
+* If done elegantly, the New Media Artist should never need to touch the halfedge mesh, go on pointer journeys, and
+* they should be able to treat the internal implementation as a black box.
+*/
 
 namespace scrib
 {
-	// == Forward Declaration of classes.
+    // == Forward Declaration of classes.
 
-	// -- Connectivity Elements.
-	
-	// Represents an entire planar graph embedding.
-	class Graph;
-	class Vertex;
-	class Face;
-	class Halfedge;
-	class Edge;
+    // -- Connectivity Elements.
 
-	// Iterators for accessing the elements from the Graph object.
-	// FIXME: I may wish to use lists instead of vectors if I ever wish to delete objects.
-	// For now they are great because they allow random access to the elements by ID.
-	typedef   vector<Vertex>::iterator   Vertex_Iter;
-	typedef   vector<Edge>::iterator     Edge_Iter;
-	typedef   vector<Face>::iterator     Face_Iter;
-	typedef   vector<Halfedge>::iterator Halfedge_Iter;
+    // Represents an entire planar graph embedding.
+    class Graph;
+    class Vertex;
+    class Face;
+    class Halfedge;
+    class Edge;
 
-	// -- Associated Data.
-	// The classes will be defined in application specific files so that this halfedge mesh header file may be reused.
-	class Graph_Data;
-	class Vertex_Data;
-	class Face_Data;
-	class Halfedge_Data;
-	class Edge_Data;
+    // Iterators for accessing the elements from the Graph object.
+    // FIXME: I may wish to use lists instead of vectors if I ever wish to delete objects.
+    // For now they are great because they allow random access to the elements by ID.
+    typedef   vector<Vertex>::iterator   Vertex_Iter;
+    typedef   vector<Edge>::iterator     Edge_Iter;
+    typedef   vector<Face>::iterator     Face_Iter;
+    typedef   vector<Halfedge>::iterator Halfedge_Iter;
 
-	// FIXME: Clean up this prose.
+    // -- Associated Data.
+    // The classes will be defined in application specific files so that this halfedge mesh header file may be reused.
+    class Graph_Data;
+    class Vertex_Data;
+    class Face_Data;
+    class Halfedge_Data;
+    class Edge_Data;
 
-	// -- Structural definition of classes.
-	// Every class is specified by its connectivity information and a pointer to associated user data.
+    // FIXME: Clean up this prose.
 
-	// All elements may be marked and unmarked by algorithms and users to specific sets of elements that meet various criteria.
+    // -- Structural definition of classes.
+    // Every class is specified by its connectivity information and a pointer to associated user data.
 
-	// The Graph class represents an entire graph embedding defined by points in space.
-	// For the purposes of the facefinder, the output graph will be planar.
-	// connected via edges that intersect only at vertices.
-	// The FaceFinder class may be used to derive a Graph from a set of potentially intersecting input polylines.
-	class Graph
-	{
+    // All elements may be marked and unmarked by algorithms and users to specific sets of elements that meet various criteria.
 
-		// Graph classes are where all of the actual data will be stored, so it contains vectors of valued data,
-		// rather than pointers.
-		// All ID's contained within these vectors will reference tha index of the object within these vectors.
+    // The Graph class represents an entire graph embedding defined by points in space.
+    // For the purposes of the facefinder, the output graph will be planar.
+    // connected via edges that intersect only at vertices.
+    // The FaceFinder class may be used to derive a Graph from a set of potentially intersecting input polylines.
+    class Graph
+    {
 
-		// Ideally, vertices, edges, and halfedges will be ordered logically according to the order they were input into the facefinder,
-		// but I will need to do some more thinking on how to formally specify these things.
-	
-	private:
+        // Graph classes are where all of the actual data will be stored, so it contains vectors of valued data,
+        // rather than pointers.
+        // All ID's contained within these vectors will reference tha index of the object within these vectors.
 
-		std::vector<Face>   faces;
-		std::vector<Vertex> vertices;
-		std::vector<Edge>   edges;
-		std::vector<Halfedge> halfedges;
+        // Ideally, vertices, edges, and halfedges will be ordered logically according to the order they were input into the facefinder,
+        // but I will need to do some more thinking on how to formally specify these things.
 
-	public:
+    private:
 
-		// Extra Application specific information.
-		Graph_Data * data;
-	
-		// -- Public Interface.
+        std::vector<Face>   faces;
+        std::vector<Vertex> vertices;
+        std::vector<Edge>   edges;
+        std::vector<Halfedge> halfedges;
 
-		// Allocation functions.
-		Face     * newFace();
-		Vertex   * newVertex();
-		Edge     * newEdge();
-		Halfedge * newHalfedge();
+    public:
 
-		// Accessing functions. We keep this interface, because then we only have to guranteed that the this.get(element.ID) = element.
-		// We could even change the internal structure to a non contiguous lookup and the interface would be preserved.
+        // Extra Application specific information.
+        Graph_Data * data;
 
-		Face * getFace(int ID)
-		{
-			return &faces[ID];
-		}
+        // -- Public Interface.
 
-		Vertex * getVertex(int ID)
-		{
-			return &vertices[ID];
-		}
+        // Allocation functions.
+        Face     * newFace();
+        Vertex   * newVertex();
+        Edge     * newEdge();
+        Halfedge * newHalfedge();
 
-		Edge * getEdge(int ID)
-		{
-			return &edges[ID];
-		}
+        // Accessing functions. We keep this interface, because then we only have to guranteed that the this.get(element.ID) = element.
+        // We could even change the internal structure to a non contiguous lookup and the interface would be preserved.
 
-		Halfedge * getHalfedge(int ID)
-		{
-			return &halfedges[ID];
-		}
+        Face * getFace(int ID)
+        {
+            return &faces[ID];
+        }
 
-		size_t numFaces()
-		{
-			return faces.size();
-		}
+        Vertex * getVertex(int ID)
+        {
+            return &vertices[ID];
+        }
 
-		size_t numVertices()
-		{
-			return vertices.size();
-		}
+        Edge * getEdge(int ID)
+        {
+            return &edges[ID];
+        }
 
-		size_t numEdges()
-		{
-			return edges.size();
-		}
+        Halfedge * getHalfedge(int ID)
+        {
+            return &halfedges[ID];
+        }
 
-		// Should theoretically be numEdges * 2.
-		size_t numHalfedges()
-		{
-			return halfedges.size();
-		}
+        size_t numFaces()
+        {
+            return faces.size();
+        }
 
-		// -- Iteration functions.
+        size_t numVertices()
+        {
+            return vertices.size();
+        }
 
-		Face_Iter facesBegin()			{ return faces.begin(); }
-		Face_Iter facesEnd()			{ return faces.end();   }
+        size_t numEdges()
+        {
+            return edges.size();
+        }
 
-		Vertex_Iter verticesBegin()		{ return vertices.begin(); }
-		Vertex_Iter verticesEnd()		{ return vertices.end();   }
+        // Should theoretically be numEdges * 2.
+        size_t numHalfedges()
+        {
+            return halfedges.size();
+        }
 
-		Edge_Iter edgesBegin()			{ return edges.begin(); }
-		Edge_Iter edgesEnd()			{ return edges.end();   }
+        // -- Iteration functions.
 
-		Halfedge_Iter halfedgesBegin()	{ return halfedges.begin(); }
-		Halfedge_Iter halfedgesEnd()	{ return halfedges.end(); }
+        Face_Iter facesBegin() { return faces.begin(); }
+        Face_Iter facesEnd() { return faces.end(); }
 
-	};
+        Vertex_Iter verticesBegin() { return vertices.begin(); }
+        Vertex_Iter verticesEnd() { return vertices.end(); }
 
-	class Face
-	{
-	public:
+        Edge_Iter edgesBegin() { return edges.begin(); }
+        Edge_Iter edgesEnd() { return edges.end(); }
 
-		// Representative from the interior loop of halfedges defining the boundary of the face.
-		Halfedge * halfedge;	
+        Halfedge_Iter halfedgesBegin() { return halfedges.begin(); }
+        Halfedge_Iter halfedgesEnd() { return halfedges.end(); }
 
-		Face_Data * data;
-		int ID;
-	};
+    };
 
-	class Vertex
-	{
-	public:
+    class Face
+    {
+    public:
 
-		// A representative halfedge that is traveling away from this Vertex.
-		// this -> halfedge -> vertex = this.
-		Halfedge * halfedge;
+        // Representative from the interior loop of halfedges defining the boundary of the face.
+        Halfedge * halfedge;
 
-		Vertex_Data * data;
-		int ID;
-	};
+        Face_Data * data;
+        int ID;
+    };
 
-	// Non directed edges, very useful for getting consecutive ID's within input polylines.
-	class Edge
-	{
-	public:
+    class Vertex
+    {
+    public:
 
-		Halfedge * halfedge;
+        // A representative halfedge that is traveling away from this Vertex.
+        // this -> halfedge -> vertex = this.
+        Halfedge * halfedge;
 
-		Edge_Data * data;
-		int ID;
-	};
+        Vertex_Data * data;
+        int ID;
+    };
+
+    // Non directed edges, very useful for getting consecutive ID's within input polylines.
+    class Edge
+    {
+    public:
+
+        Halfedge * halfedge;
+
+        Edge_Data * data;
+        int ID;
+    };
 
 
-	class Halfedge
-	{
-	public:
+    class Halfedge
+    {
+    public:
 
-		Halfedge * twin;
-		Halfedge * next;
-		Halfedge * prev;
+        Halfedge * twin;
+        Halfedge * next;
+        Halfedge * prev;
 
-		Face * face;
-		Edge * edge;
-		Vertex * vertex;
+        Face * face;
+        Edge * edge;
+        Vertex * vertex;
 
-		Halfedge_Data * data;
-		int ID;
-	};
+        Halfedge_Data * data;
+        int ID;
+    };
 }

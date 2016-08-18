@@ -5,7 +5,7 @@
 *
 * Written by Bryce Summers.
 *
-* 8/16/2016: Written as a more fully advanced version of FaceFinder.h, 
+* 8/16/2016: Written as a more fully advanced version of FaceFinder.h,
 *            which outputs sophisticated graph structures oozing with useful connectivity information.
 *
 * Written for the STUDIO for Creative Inquiry at Carnegie Mellon University.
@@ -62,153 +62,153 @@
 namespace scrib {
 
 
-	class PolylineGraphEmbedder
-	{
-	public:
+    class PolylineGraphEmbedder
+    {
+    public:
 
-		// A User can explicitly pass false to force the intersection points to be found using a brute force algorithm that
-		// may potentially be more robust and reliable than the optimized intersection algorithm,
-		// but it kills the performance.
-		PolylineGraphEmbedder(bool useFastAlgo = true)
-		{
-			bUseFastAlgo = useFastAlgo;
-			closed_loop = false;
-		};
-		virtual ~PolylineGraphEmbedder() {};
+        // A User can explicitly pass false to force the intersection points to be found using a brute force algorithm that
+        // may potentially be more robust and reliable than the optimized intersection algorithm,
+        // but it kills the performance.
+        PolylineGraphEmbedder(bool useFastAlgo = true)
+        {
+            bUseFastAlgo = useFastAlgo;
+            closed_loop = false;
+        };
+        virtual ~PolylineGraphEmbedder() {};
 
-		// Tells this face finder to interpret the input curve as a line if open and a closed loop if closed.
-		// If close, it will consider endpoints as attached to each other.
-		void setClosed(bool isClosed);
+        // Tells this face finder to interpret the input curve as a line if open and a closed loop if closed.
+        // If close, it will consider endpoints as attached to each other.
+        void setClosed(bool isClosed);
 
-		// Derives a planar graph embedding from the given input polyline.
-		// The input will be interpretted as open or closed depending on the value of this.closed_loop;
-		// Assumes all points are distinct.
-		// Offsets all input points by a small random amount to prevent degeneracies from vertical edges.
-		Graph * embedPolyline(std::vector<ofPoint> * inputs);
+        // Derives a planar graph embedding from the given input polyline.
+        // The input will be interpretted as open or closed depending on the value of this.closed_loop;
+        // Assumes all points are distinct.
+        // Offsets all input points by a small random amount to prevent degeneracies from vertical edges.
+        Graph * embedPolyline(std::vector<ofPoint> * inputs);
 
-		// Derive faces from a set list of vertex disjoint polyline inputs.
-		Graph * embedPolylineSet(std::vector< std::vector<ofPoint> *> * inputs);
+        // Derive faces from a set list of vertex disjoint polyline inputs.
+        Graph * embedPolylineSet(std::vector< std::vector<ofPoint> *> * inputs);
 
-	protected:
-	private:
+    protected:
+    private:
 
-		// The trivial function constructs the proper output for input polylines of size 1 or 0.
-		// ASSUMES input is of size 0 or 1.
-		inline Graph * trivial(std::vector<ofPoint> * inputs);
-		inline Graph * do_the_rest();
+        // The trivial function constructs the proper output for input polylines of size 1 or 0.
+        // ASSUMES input is of size 0 or 1.
+        inline Graph * trivial(std::vector<ofPoint> * inputs);
+        inline Graph * do_the_rest();
 
-		bool bUseFastAlgo;
-		bool closed_loop;
+        bool bUseFastAlgo;
+        bool closed_loop;
 
-		// -- Step 1. Compute canonical input structures.
+        // -- Step 1. Compute canonical input structures.
 
-		// The embedding is broken down into seperate phases. Here I have listed each operation,
-		// followed by the data structures that they have built.
+        // The embedding is broken down into seperate phases. Here I have listed each operation,
+        // followed by the data structures that they have built.
 
-		// Appends the given input points to the collated single input point array.
-		// Performs point fudging to avoid degenerate behavior.
-		// Starts up the indexed collection of points.
-		void loadInput(std::vector<ofPoint> * inputs);
+        // Appends the given input points to the collated single input point array.
+        // Performs point fudging to avoid degenerate behavior.
+        // Starts up the indexed collection of points.
+        void loadInput(std::vector<ofPoint> * inputs);
 
-		// The canonical collection of points at their proper indices.
-		std::vector<ofPoint> points;
-		// The original input lines.
-		std::vector<scrib::Line> lines_initial;
+        // The canonical collection of points at their proper indices.
+        std::vector<ofPoint> points;
+        // The original input lines.
+        std::vector<scrib::Line> lines_initial;
 
-		// -- Step 2. Find intersections in the input and compute the embedded polyline structure.
+        // -- Step 2. Find intersections in the input and compute the embedded polyline structure.
 
-		// Intersects the input lines, then splits them and connects them appropiatly.
-		// Populates the list of edge disjoint lines that only intersect at vertices.
-		// puts the edge in consecutive order following the input polylines.
-		// results put into this.lines_split
-		void splitIntersectionPoints();
+        // Intersects the input lines, then splits them and connects them appropiatly.
+        // Populates the list of edge disjoint lines that only intersect at vertices.
+        // puts the edge in consecutive order following the input polylines.
+        // results put into this.lines_split
+        void splitIntersectionPoints();
 
-		// Split version of original input lines, where lines only intersect at vertices.
-		std::vector<scrib::Line> lines_split;
+        // Split version of original input lines, where lines only intersect at vertices.
+        std::vector<scrib::Line> lines_split;
 
-		// Allocates the output graph object and allocates vertices, edges, and halfedges for the input data.
-		// Vertices are Indexed as follows [original points 1 for input polyline 1, then 2, ...,
-		// new intersection points for polyline 1, then 2, etc, ...]
-		// Halfedges are indexed in polyline input order, then in backwards input order.
-		// -- Step 3. Proccess the embedded input and initialize the Planar Graph vertices, edges, and halfedges.
-		void allocate_graph_from_input();
+        // Allocates the output graph object and allocates vertices, edges, and halfedges for the input data.
+        // Vertices are Indexed as follows [original points 1 for input polyline 1, then 2, ...,
+        // new intersection points for polyline 1, then 2, etc, ...]
+        // Halfedges are indexed in polyline input order, then in backwards input order.
+        // -- Step 3. Proccess the embedded input and initialize the Planar Graph vertices, edges, and halfedges.
+        void allocate_graph_from_input();
 
-		// The graph that is being built.
-		// Once it is returned, the responsibility for this memory transfers to the user and the pointer is forgotten from this class.
-		// FIXME: Shared_ptr or some other supposedly better pointer type?
-		Graph * graph;
+        // The graph that is being built.
+        // Once it is returned, the responsibility for this memory transfers to the user and the pointer is forgotten from this class.
+        // FIXME: Shared_ptr or some other supposedly better pointer type?
+        Graph * graph;
 
-		// -- Step 4. Sort all outgoing edge lists for intersection vertices by the cartesian angle of the edges.
-		void sort_outgoing_edges_by_angle();
+        // -- Step 4. Sort all outgoing edge lists for intersection vertices by the cartesian angle of the edges.
+        void sort_outgoing_edges_by_angle();
 
-		// Step 4 helper function.
-		// Sorts the outgoing_indies by the angles of the lines from the center
-		// point to the points cooresponding to the outgoing indices.
-		void sort_outgoing_edges(std::vector<Halfedge * > & outgoing_indices);
+        // Step 4 helper function.
+        // Sorts the outgoing_indies by the angles of the lines from the center
+        // point to the points cooresponding to the outgoing indices.
+        void sort_outgoing_edges(std::vector<Halfedge * > & outgoing_indices);
 
-		// -- Step 5.
-		// Determines the next and previous pointers for the halfedges in the Graph.
-		// This is done almost entirely using the sets of outgoing edges for each vertex.
-		// vertices of degree 2 associate their 2 pairs of neighbors.
-		// vertices of degree are on a tail and associate their one pair of neighbors.
-		// vertices of degree >2 are intersection points and they first sort their neighbors, then associate their star.
-		// This function sets the Vertex_Data objects classification data.
-		void associate_halfedge_cycles();
-
-
-		// Step 6.
-		// Uses the vertex and edge complete halfedge mesh to add face data.
-		// Also produces simpler cycle structures along that serve as an alternate representation of the faces.
-		Graph * deriveFaces();
-
-		/* 
-		 * REQUIRES: 1. face -> halfedge well defined already.
-		 *			 2. halfedge next pointer well defined already.
-		 * ENSURES:  links every halfedge in the loop starting and ending at face -> halfedge
-		 *           with the face.
-		 */
-		void trace_face(Face * face);
-
-		// Free all of the intermediary data structures.
-		// Clear input structures.
-		// Unmark the output.
-		void cleanup();
+        // -- Step 5.
+        // Determines the next and previous pointers for the halfedges in the Graph.
+        // This is done almost entirely using the sets of outgoing edges for each vertex.
+        // vertices of degree 2 associate their 2 pairs of neighbors.
+        // vertices of degree are on a tail and associate their one pair of neighbors.
+        // vertices of degree >2 are intersection points and they first sort their neighbors, then associate their star.
+        // This function sets the Vertex_Data objects classification data.
+        void associate_halfedge_cycles();
 
 
-	// Helper functions.
-	private:
+        // Step 6.
+        // Uses the vertex and edge complete halfedge mesh to add face data.
+        // Also produces simpler cycle structures along that serve as an alternate representation of the faces.
+        Graph * deriveFaces();
 
-		// Application Specific allocation functions.
-		// REQUIRE: All allocation function need the graph to be already instantiated.
+        /*
+        * REQUIRES: 1. face -> halfedge well defined already.
+        *			 2. halfedge next pointer well defined already.
+        * ENSURES:  links every halfedge in the loop starting and ending at face -> halfedge
+        *           with the face.
+        */
+        void trace_face(Face * face);
 
-		Face * newFace()
-		{
-			Face * output = graph -> newFace();
-			output -> data = new Face_Data(output);
-			return output;
-		};
+        // Free all of the intermediary data structures.
+        // Clear input structures.
+        // Unmark the output.
+        void cleanup();
 
-		Edge * newEdge()
-		{
-			Edge * output = graph -> newEdge();
-			output -> data = new Edge_Data(output);
-			return output;
-		}
 
-		Halfedge * newHalfedge()
-		{
-			Halfedge * output = graph -> newHalfedge();
-			output -> data = new Halfedge_Data(output);
-			return output;
-		}
+        // Helper functions.
+    private:
 
-		Vertex * newVertex()
-		{
-			Vertex * output = graph -> newVertex();
-			output -> data = new Vertex_Data(output);
-			return output;
-		}
+        // Application Specific allocation functions.
+        // REQUIRE: All allocation function need the graph to be already instantiated.
 
-	};
+        Face * newFace()
+        {
+            Face * output = graph->newFace();
+            output->data = new Face_Data(output);
+            return output;
+        };
+
+        Edge * newEdge()
+        {
+            Edge * output = graph->newEdge();
+            output->data = new Edge_Data(output);
+            return output;
+        }
+
+        Halfedge * newHalfedge()
+        {
+            Halfedge * output = graph->newHalfedge();
+            output->data = new Halfedge_Data(output);
+            return output;
+        }
+
+        Vertex * newVertex()
+        {
+            Vertex * output = graph->newVertex();
+            output->data = new Vertex_Data(output);
+            return output;
+        }
+
+    };
 
 }
