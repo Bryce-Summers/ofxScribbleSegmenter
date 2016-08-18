@@ -57,24 +57,24 @@
 #include "Line.h"
 #include "Intersector.h"
 #include "HalfedgeGraph.h"
-#include "PolylinePlanarGraphData.h"
+#include "PolylineGraphData.h"
 
 namespace scrib {
 
 
-	class GraphEmbedder
+	class PolylineGraphEmbedder
 	{
 	public:
 
 		// A User can explicitly pass false to force the intersection points to be found using a brute force algorithm that
 		// may potentially be more robust and reliable than the optimized intersection algorithm,
 		// but it kills the performance.
-		GraphEmbedder(bool useFastAlgo = true)
+		PolylineGraphEmbedder(bool useFastAlgo = true)
 		{
 			bUseFastAlgo = useFastAlgo;
 			closed_loop = false;
 		};
-		virtual ~GraphEmbedder() {};
+		virtual ~PolylineGraphEmbedder() {};
 
 		// Tells this face finder to interpret the input curve as a line if open and a closed loop if closed.
 		// If close, it will consider endpoints as attached to each other.
@@ -130,43 +130,44 @@ namespace scrib {
 		// Vertices are Indexed as follows [original points 1 for input polyline 1, then 2, ...,
 		// new intersection points for polyline 1, then 2, etc, ...]
 		// Halfedges are indexed in polyline input order, then in backwards input order.
+		// -- Step 3. Proccess the embedded input and initialize the Planar Graph vertices, edges, and halfedges.
 		void allocate_graph_from_input();
 
 		// The graph that is being built.
 		// Once it is returned, the responsibility for this memory transfers to the user and the pointer is forgotten from this class.
+		// FIXME: Shared_ptr or some other supposedly better pointer type?
 		Graph * graph;
 
-		// -- Step 3. Proccess the embedded input and initialize the Planar Graph vertices, edges, and halfedges.
+		// -- Step 4. Sort all outgoing edge lists for intersection vertices by the cartesian angle of the edges.
+		void sort_outgoing_edges_by_angle();
 
+		// Step 4 helper function.
+		// Sorts the outgoing_indies by the angles of the lines from the center
+		// point to the points cooresponding to the outgoing indices.
+		void sort_outgoing_edges(std::vector<Halfedge * > & outgoing_indices);
+
+		// -- Step 5.
 		// Determines the next and previous pointers for the halfedges in the Graph.
+		// This is done almost entirely using the sets of outgoing edges for each vertex.
+		// vertices of degree 2 associate their 2 pairs of neighbors.
+		// vertices of degree are on a tail and associate their one pair of neighbors.
+		// vertices of degree >2 are intersection points and they first sort their neighbors, then associate their star.
+		// This function sets the Vertex_Data objects classification data.
 		void associate_halfedge_cycles();
 
-		// The directed graph that represents edges between points. This temporary structure helps out in linking.
-		// Given the ID of a vertex, this returns the set of halfedges traveling away from the point.
-		std::map<int, std::vector<Halfedge *> *> directed_graph;
 
-		// -- Step 3 Helper functions.
-
-		void addHalfedge(Halfedge *);
-
-		// Sort the graph by the cartesian angle of the edges.
-		void sort_graph_by_edge_angle();
-
-		// Sorts the outgoing_indices by the angles of the lines from the center
-		// point to the points cooresponding to the outgoing indices.
-		void sort_vertice_by_edge_angle(std::vector<Halfedge *> outgoing_edges);
-
+		// Step 6.
 		// Uses the vertex and edge complete halfedge mesh to add face data.
 		// Also produces simpler cycle structures along that serve as an alternate representation of the faces.
 		Graph * deriveFaces();
 
 		/* 
-		 * Traces and outputs cycles following the halfedge cycles.
-		 * Sets the proper face connectivity information in this.Graph along the way.
-		 * Marks halfedges that have been traced to ensure traces are unique.
-		 * The marks will be removed later.
+		 * REQUIRES: 1. face -> halfedge well defined already.
+		 *			 2. halfedge next pointer well defined already.
+		 * ENSURES:  links every halfedge in the loop starting and ending at face -> halfedge
+		 *           with the face.
 		 */
-		std::vector<point_info> * traceCycle(Halfedge * edge);
+		void trace_face(Face * face);
 
 		// Free all of the intermediary data structures.
 		// Clear input structures.

@@ -22,9 +22,6 @@ namespace scrib
 		{
 			this->graph = graph;
 		}
-
-		// This may be useful to legacy code and people who want a simpler more genaric c++ output format.
-		std::vector<std::vector<point_info>> faces;
 	};
 
 	class Face_Data
@@ -73,11 +70,18 @@ namespace scrib
 		// Labels Vertices that have more than two outgoing edges.
 		bool intersection_point = false;
 
+		// FIXME: Remove this if it is just taking up unneeded space.
+		bool singleton_point = false;
+
 		bool isExtraordinary()
 		{
 			return tail_point || intersection_point;
 		}
 
+		// Used as a temporary structure for graph construction, but it is also may be relevant to users.
+		// I don't know whether I will maintain this structure outside of graph construction.
+		// FIXME: I might switch this to being a pointer to allow for me to null it out when no longer needed.
+		std::vector<Halfedge *> outgoing_edges;
 	};
 
 	class Edge_Data
@@ -121,20 +125,5 @@ namespace scrib
 		{
 			return halfedge -> vertex -> data -> isExtraordinary();
 		}
-	};
-
-	class point_info
-	{
-	public:
-
-		// -- Constructor.
-		point_info(ofPoint p, int id)
-		{
-			point = p;
-			ID = id;
-		}
-
-		ofPoint point;
-		int ID;
 	};
 }

@@ -6,7 +6,9 @@
  *
  * Written by Bryce Summers.
  * 6/26/2015: Wrote Original.
- * 8/16/2016: Rewrote as GraphEmbedder in order to output full graph embeddings using a half edge structure.
+ * 8/16/2016: Rewrote as PlanarGraphEmbedder in order to output full graph embeddings using a half edge structure.
+ *            This class remains as a very focused class.
+ * 8/18/2016: Post proccessing operations have been moved to PolylineGraphEmbedder
  *
  * Written for the STUDIO for Creative Inquiry at Carnegie Mellon University.
  */
@@ -15,8 +17,7 @@
 #include "ofMain.h"
 #include "Line.h"
 #include "Intersector.h"
-#include "CurveFunctions.h"
-#include "HalfedgeGraph.h"
+#include "PolylineGraphPostProcessor.h" // point_info definition.
 
 namespace scrib{
 
@@ -64,7 +65,6 @@ class FaceFinder
          *    i.e. Those produced in open and closed mode.
          */
 
-
         // Derive faces from a single polyline input.
         // No guarantee is made about the order of the polygons.
         // The Output is a list of sub polygons.
@@ -80,27 +80,6 @@ class FaceFinder
         std::vector< // Each polygon is a list of points.
         point_info // Information about the Point.
         > *> * FindFaces(std::vector< std::vector<ofPoint> *> * inputs);
-
-        // -- Post processing algorithms.
-
-        // Appends the indices of any external faces amongst the input list of faces to the output vector.
-        // NOTE : The input type is equivelant to the output type of the face finding functions,
-        // so using this function may be a natural extension of using the original functions.
-        void determineExternalFaces(std::vector<std::vector<point_info> *> * input, std::vector<int> * output);
-
-        // Appends to output the indices of the faces of **NonTrivial** Area (area >= min_area)
-        void determineNonTrivialAreaFaces(std::vector<std::vector<point_info> *> * input, std::vector<int> * output, float min_area);
-        // Appends to output the indices of the faces of **Trivial** Area (area < min_area)
-        void determineTrivialAreaFaces(std::vector<std::vector<point_info> *> * input, std::vector<int> * output, float min_area);
-
-        // Input: a set of faces, Output: a new set of faces that have no trivial contiguous subfaces.
-        // ENSURES: Polygons will be output either open or closed in the manner that they are passed in.
-        // ENSURES: Omits faces consisting of only a single long tail.
-        std::vector<std::vector<point_info> *> * clipTails(std::vector<std::vector<point_info> *> * input);
-
-        // Returns a copy of the single input face without any trivial area contiguous subfaces. (Tails)
-        // May return a 0 point polyline if the input line is non-intersecting.
-        std::vector<point_info> * clipTails(std::vector<point_info> * input);
 
         // Tells this face finder to interpret the input curve as a line if open and a closed loop if closed.
         // If close, it will consider endpoints as attached to each other.

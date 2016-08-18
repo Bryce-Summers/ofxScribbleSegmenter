@@ -39,6 +39,14 @@ namespace scrib
 	class Halfedge;
 	class Edge;
 
+	// Iterators for accessing the elements from the Graph object.
+	// FIXME: I may wish to use lists instead of vectors if I ever wish to delete objects.
+	// For now they are great because they allow random access to the elements by ID.
+	typedef   vector<Vertex>::iterator   Vertex_Iter;
+	typedef   vector<Edge>::iterator     Edge_Iter;
+	typedef   vector<Face>::iterator     Face_Iter;
+	typedef   vector<Halfedge>::iterator Halfedge_Iter;
+
 	// -- Associated Data.
 	// The classes will be defined in application specific files so that this halfedge mesh header file may be reused.
 	class Graph_Data;
@@ -77,6 +85,7 @@ namespace scrib
 
 	public:
 
+		// Extra Application specific information.
 		Graph_Data * data;
 	
 		// -- Public Interface.
@@ -162,7 +171,20 @@ namespace scrib
 			return halfedges.size();
 		}
 
-		// -- Extra Information.
+		// -- Iteration functions.
+
+		Face_Iter facesBegin()			{ return faces.begin(); }
+		Face_Iter facesEnd()			{ return faces.end();   }
+
+		Vertex_Iter verticesBegin()		{ return vertices.begin(); }
+		Vertex_Iter verticesEnd()		{ return vertices.end();   }
+
+		Edge_Iter edgesBegin()			{ return edges.begin(); }
+		Edge_Iter edgesEnd()			{ return edges.end();   }
+
+		Halfedge_Iter halfedgesBegin()	{ return halfedges.begin(); }
+		Halfedge_Iter halfedgesEnd()	{ return halfedges.end(); }
+
 	};
 
 	class Face
