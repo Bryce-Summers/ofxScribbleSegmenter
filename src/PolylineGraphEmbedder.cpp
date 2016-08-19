@@ -402,13 +402,13 @@ namespace scrib {
 
         // For each halfedge, output its cycle once.
 
-        Halfedge_Iter start = graph->halfedgesBegin();
-        Halfedge_Iter end = graph->halfedgesEnd();
+        Halfedge_Iter start = graph -> halfedgesBegin();
+        Halfedge_Iter end   = graph -> halfedgesEnd();
 
         // Iterate through all originating points.
         for (Halfedge_Iter halfedge = start; halfedge != end; halfedge++)
         {
-            Halfedge_Data * halfedge_data = halfedge->data;
+            Halfedge_Data * halfedge_data = halfedge -> data;
 
             // Avoid previously traced cycles.
             if (halfedge_data->marked)
@@ -418,9 +418,12 @@ namespace scrib {
 
             Face * face = newFace(); // GraphEmbedder::newFace() ...
 
-            face->halfedge = &(*halfedge);
+            face -> halfedge = &(*halfedge);
             trace_face(face);
         }
+
+        // Clear the marks.
+        graph -> data -> clearHalfedgeMarks();
 
         return graph;
     }
@@ -428,14 +431,14 @@ namespace scrib {
     // Isn't this nice and conscise?
     void PolylineGraphEmbedder::trace_face(Face * face)
     {
-        Halfedge * start = face->halfedge;
+        Halfedge * start   = face -> halfedge;
         Halfedge * current = start;
 
         do
         {
-            current->face = face;
-            current->data->marked = true;
-            current = current->next;
+            current -> face = face;
+            current -> data -> marked = true;
+            current = current -> next;
         } while (current != start);
     }
 

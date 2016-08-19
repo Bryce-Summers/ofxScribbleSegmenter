@@ -50,6 +50,16 @@ namespace scrib
         return area / 2.0;
     }
 
+    bool  isComplemented(Point_Vector_Format * closed_polygon)
+    {
+        return computeAreaOfPolygon(closed_polygon) > 0;
+    }
+
+    bool  isComplemented(OF_Point_Vector_Format * closed_polygon)
+    {
+        return computeAreaOfPolygon(closed_polygon) > 0;
+    }
+
     Face_Vector_Format * PolylineGraphPostProcessor::convert_to_face_vectors()
     {
         Face_Vector_Format * output = new Face_Vector_Format();
@@ -93,11 +103,11 @@ namespace scrib
 
         for (int index = 0; index < len; index++)
         {
-            float area = computeAreaOfPolygon(input->at(index));
+            float area = computeAreaOfPolygon(input -> at(index));
 
             if (area > 0)
             {
-                output->push_back(index);
+                output -> push_back(index);
             }
         }
     }
@@ -106,7 +116,7 @@ namespace scrib
     {
         Face_Vector_Format * input = face_vector;
 
-        int len = input->size();
+        int len = input -> size();
 
         for (int index = 0; index < len; index++)
         {
@@ -170,7 +180,7 @@ namespace scrib
     {
         std::vector<point_info> * output = new std::vector<point_info>();
 
-        int len = input->size();
+        int len = input -> size();
 
         // Faces cannot enclose area if they have less than 3 vertices.
         // This pre check rules out trivial input without a start and end point.
@@ -304,4 +314,101 @@ namespace scrib
 
         return output;
     }
+
+    
+
+    std::vector<face_info *> * PolylineGraphPostProcessor::mergeFaces(ID_Set * face_ID_set)
+    {
+        // Temporarily store the raw list of face_info's.
+        std::vector < face_info *> faces_uncomplemented;
+        std::vector < face_info *> faces_complemented;
+
+        // Go through all halfedges in all relevant faces and trace any representational union faces one time each.
+        for (auto iter = face_ID_set -> begin(); iter != face_ID_set -> end(); iter++)
+        {
+            Face     * face    = graph -> getFace(*iter);
+            Halfedge * start   = face  -> halfedge;
+            Halfedge * current = face->halfedge;
+            do
+            {
+                if (face -> data -> marked == false && _halfedgeInUnion(face_ID_set, current))
+                {
+                    face -> data -> marked = true;
+                    face_info * face = _traceUnionFace(face_ID_set, current);
+                    if (!isComplemented(&(face->points)))
+                    {
+                        face -> complemented = false;
+                        faces_uncomplemented.push_back(face);
+                    }
+                    else
+                    {
+                        face -> complemented = true;
+                        faces_complemented.push_back(face);
+                    }
+                }
+            } while (current != start);
+        }
+
+        // Clear markings.
+        graph -> data -> clearFaceMarks();
+
+        // Now we associate face_info objects with their internal complemented hole objects.
+        std::vector<face_info *> * output = new std::vector<face_info *>();
+        
+        std::map<int, face_info *> map;
+
+        // On the first pass we add all exterior faces to the output and the map.
+        for (auto iter = faces_uncomplemented.begin(); iter != faces_uncomplemented.end(); iter++)
+        {
+            face_info * face = *iter;
+
+            output -> push_back(face);
+            ID_Set & set = face -> faces_ID_set;
+            for (auto id = set.begin(); id != set.end(); id++)
+            {
+                map[*id] = face;
+            }
+
+        }
+
+        // On the second pass we add all complemented faces to the proper uncomplemented face hole set.
+        // FIXME: Think about what will happen if their is a complemented face that should be by itself.
+        //        What about merging a complemented and uncomplemented face.
+        for (auto iter = faces_complemented.begin(); iter != faces_complemented.end(); iter++)
+        {
+            face_info * face = *iter;
+            int ID = *(face -> faces_ID_set.begin());
+            std::map<int, face_info *>::const_iterator it = map.find(ID);
+
+            // If the index is not associated with an uncomplemented face, then this uncomplemented face must be singleton,
+            // instead of a hole. We therefore add it to the direct output.
+            if (it == map.end())
+            {
+                output -> push_back(face);
+                continue;
+            }
+
+            // Otherwise we add it as a hole to the relevant face.
+            face_info * uncomplemented_face = it -> second;
+            uncomplemented_face -> holes.push_back(face);
+        }
+
+        return output;
+    }
+
+    bool _halfedgeInUnion(ID_Set * face_ID_set, Halfedge * start)
+    {
+        Face * twin_face = start -> twin -> face;
+        int ID = twin_face -> ID;
+        ID_Set::const_iterator it = face_ID_set -> find(ID);
+
+        // Twin face not in the set of faces in the union.
+        return it == face_ID_set -> end();
+    }
+
+    face_info * _traceUnionFace(ID_Set * face_ID_set, Halfedge * start)
+    {
+
+    }
+
 }

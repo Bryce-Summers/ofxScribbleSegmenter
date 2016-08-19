@@ -24,6 +24,14 @@
 namespace scrib
 {
 
+    // Convenience Typedefs.
+    // Same old fashion mainstream c++ vectors, just an alis name.
+    typedef std::vector<point_info> Point_Vector_Format;
+    typedef std::vector<ofPoint> OF_Point_Vector_Format;
+    typedef std::vector<Point_Vector_Format *> Face_Vector_Format;
+    typedef std::vector<int> Int_Vector_Format;
+    typedef std::set<int> ID_Set;
+
     class point_info
     {
     public:
@@ -39,12 +47,18 @@ namespace scrib
         int ID;
     };
 
-    // Convenience Typedefs.
-    // Same old fashion mainstream c++ vectors, just an alis name.
-    typedef std::vector<point_info> Point_Vector_Format;
-    typedef std::vector<ofPoint> OF_Point_Vector_Format;
-    typedef std::vector<Point_Vector_Format *> Face_Vector_Format;
+    class face_info
+    {
+    public:
+        //int color;
+        std::vector<face_info *> holes;
+        Point_Vector_Format points;
 
+        // Contains a list of all faces contributing to this unioned face.
+        ID_SET faces_ID_set;
+
+        bool complemented;
+    };
 
     /*
     * http://math.blogoverflow.com/2014/06/04/greens-theorem-and-area-of-polygons/
@@ -54,6 +68,7 @@ namespace scrib
     * Also see: https://brycesummers.wordpress.com/2015/08/24/a-proof-of-simple-polygonal-area-via-greens-theorem/
     */
     float computeAreaOfPolygon(Point_Vector_Format * closed_polygon);
+    bool  isComplemented      (Point_Vector_Format * closed_polygon);
 
     /*
     * http://math.blogoverflow.com/2014/06/04/greens-theorem-and-area-of-polygons/
@@ -63,7 +78,7 @@ namespace scrib
     * Also see: https://brycesummers.wordpress.com/2015/08/24/a-proof-of-simple-polygonal-area-via-greens-theorem/
     */
     float computeAreaOfPolygon(OF_Point_Vector_Format * closed_polygon);
-
+    bool  isComplemented      (OF_Point_Vector_Format * closed_polygon);
 
     class PolylineGraphPostProcessor
     {
@@ -111,9 +126,9 @@ namespace scrib
         void determineExternalFaces(std::vector<int> * output);
 
         // Appends to output the indices of the faces of **NonTrivial** Area (area >= min_area)
-        void determineNonTrivialAreaFaces(std::vector<int> * output, float min_area);
+        void determineNonTrivialAreaFaces(Int_Vector_Format * output, float min_area);
         // Appends to output the indices of the faces of **Trivial** Area (area < min_area)
-        void determineTrivialAreaFaces(std::vector<int> * output, float min_area);
+        void determineTrivialAreaFaces(Int_Vector_Format * output, float min_area);
 
         // Input: a set of faces, Output: a new set of faces that have no trivial contiguous subfaces.
         // ENSURES: Polygons will be output either open or closed in the manner that they are passed in.
@@ -124,6 +139,21 @@ namespace scrib
         // Returns a copy of the single input face without any trivial area contiguous subfaces. (Tails)
         // May return a 0 point polyline if the input line is non-intersecting.
         std::vector<point_info> * clipTails(Point_Vector_Format * input);
+
+        // Uses the currently loaded this->graph object as Input.
+        // Takes in a vector containing the integer IDs of the faces to be merged.
+        // Outputs the result of unioning all of the faces.
+        std::vector<face_info *> * mergeFaces(ID_Set * face_ID_set);
+
+    private:
+        
+        // Returns true iff the given hafedge is included in the output of the union of the given faces.
+        // I.E. returns true iff the given half edge contains a twin whose face is not within the given set.
+        bool _halfedgeInUnion(ID_Set * face_ID_set, Halfedge * start);
+
+        // Given an In Union halfege, traces its face_info union face information.
+        // Properly sets the output's: points and face_IDs fields.
+        face_info * _traceUnionFace(ID_Set * face_ID_set, Halfedge * start);
 
     };
 }

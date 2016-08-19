@@ -152,7 +152,7 @@ namespace scrib
         Edge_Iter edgesEnd() { return edges.end(); }
 
         Halfedge_Iter halfedgesBegin() { return halfedges.begin(); }
-        Halfedge_Iter halfedgesEnd() { return halfedges.end(); }
+        Halfedge_Iter halfedgesEnd()   { return halfedges.end();   }
 
     };
 
