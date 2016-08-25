@@ -24,6 +24,11 @@
 namespace scrib
 {
 
+    // Forward declare types.
+    class point_info;
+    class face_info;
+
+
     // Convenience Typedefs.
     // Same old fashion mainstream c++ vectors, just an alis name.
     typedef std::vector<point_info> Point_Vector_Format;
@@ -37,14 +42,31 @@ namespace scrib
     public:
 
         // -- Constructor.
+        
+        // Used in Facefinder for non halfedgemesh based embeddings.
         point_info(ofPoint p, int id)
         {
             point = p;
             ID = id;
         }
 
+        point_info(ofPoint p, int id, Halfedge * hedge)
+        {
+            point = p;
+            ID = id;
+            this -> halfedge = hedge;
+        }
+
         ofPoint point;
         int ID;
+
+        // The halfedge that this point represents when this point is collected in a Point_Vector to represent a face.
+        // This may be used to easily extract local connectivity information and attributes for this point and its neighbors.
+        // WARNING: This always points to the original embedding's connectivity information,
+        // which means that things like next pointers may no longer be valid after tails are clipped or other algorithms.
+        // Faces and twin pointers should still be valid though...
+        // Undefined for output from scrib::FaceFinder.
+        Halfedge * halfedge = NULL;
     };
 
     class face_info
@@ -55,7 +77,7 @@ namespace scrib
         Point_Vector_Format points;
 
         // Contains a list of all faces contributing to this unioned face.
-        ID_SET faces_ID_set;
+        ID_Set faces_ID_set;
 
         bool complemented;
     };
@@ -138,7 +160,7 @@ namespace scrib
 
         // Returns a copy of the single input face without any trivial area contiguous subfaces. (Tails)
         // May return a 0 point polyline if the input line is non-intersecting.
-        std::vector<point_info> * clipTails(Point_Vector_Format * input);
+        Point_Vector_Format * clipTails(Point_Vector_Format * input);
 
         // Uses the currently loaded this->graph object as Input.
         // Takes in a vector containing the integer IDs of the faces to be merged.
@@ -148,12 +170,18 @@ namespace scrib
     private:
         
         // Returns true iff the given hafedge is included in the output of the union of the given faces.
-        // I.E. returns true iff the given half edge contains a twin whose face is not within the given set.
+        // I.E. returns true iff the given half edge -> face is within the set of unioned faces and half_edge->twin -> face is not.
         bool _halfedgeInUnion(ID_Set * face_ID_set, Halfedge * start);
 
         // Given an In Union halfege, traces its face_info union face information.
         // Properly sets the output's: points and face_IDs fields.
+        // Marks halfedges, therefore calling functions are responsible for unmarking halfedges.
         face_info * _traceUnionFace(ID_Set * face_ID_set, Halfedge * start);
+
+        // Given a halfedge inside of a unionface, returns the next halfedge within that face.
+        Halfedge * nextUnionFace(ID_Set * face_ID_Set, Halfedge * current);
+
+        point_info halfedgeToPointInfo(Halfedge * halfedge);
 
     };
 }

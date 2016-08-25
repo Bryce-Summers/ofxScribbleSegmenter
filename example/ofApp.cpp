@@ -1,11 +1,22 @@
 #include "ofApp.h"
 
 //--------------------------------------------------------------
+
+void ofApp::resetState()
+{
+    num = 0;
+    merge_ID_1 = 0;
+    merge_ID_2 = 1;
+    display_input_polyline = false;
+
+    updateMergeFaces();
+}
+
 void ofApp::setup(){
 
-    num = 0;
-
     bool display_input_polyline = true;
+
+    merge_faces = NULL;
 
     // These initial example lists of points represent square-ish shapes.
     /*  |
@@ -63,7 +74,7 @@ void ofApp::setup(){
     len = faces -> size();
     for(int i = 0; i < len; i++)
     {
-        std::vector<scrib::point_info> * polygon = faces->at(i);
+        scrib::Point_Vector_Format * polygon = faces -> at(i);
         int polygon_len = polygon -> size();
 
         cout << "Polygon " << i << endl;
@@ -75,6 +86,9 @@ void ofApp::setup(){
                     ", index = "  << p_info.ID << endl;
         }
     }
+
+    resetState();
+
 }
 
 //--------------------------------------------------------------
@@ -99,33 +113,8 @@ void ofApp::draw(){
 
     for(int i = 0; i < len; i++)
     {
-
-        std::vector<scrib::point_info> * points = faces -> at(i);
-
-        // If the face is of trivial size.
-        if (points -> size() < 1)
-        {
-            continue;
-        }
-
-        int len2 = points->size();
-
-        ofPath p = ofPath();
-        p.setStrokeColor(128);
-        p.setStrokeWidth(1);
-
-        ofPoint pt = points -> at(0).point;
-        p.moveTo(pt.x, pt.y);
-
-        for(int i2 = 1; i2 < len2; i2++)
-        {
-            ofPoint pt = points -> at(i2).point;
-            p.lineTo(pt.x, pt.y);
-        }
-
-        p.setFilled(i == num);
-        p.close();
-        p.draw();
+        scrib::Point_Vector_Format * points = faces->at(i);
+        drawPath(points, 128, 1.0, i == num);
     }
 
     // -- Draw the entire scribble.
@@ -137,9 +126,40 @@ void ofApp::draw(){
 
     //drawPath(points_2);
 
+    drawMergeFaces();
 
     ofDrawBitmapString("Press 'A' and 'D' to cycle left and right through the faces.", 20, 170);
     ofDrawBitmapString("Click and drag the mouse in a wild pattern, then release to test new scribbles!", 20, 200);
+
+}
+
+void ofApp::drawPath(scrib::Point_Vector_Format * points, int color, float strokeWidth, bool filled)
+{
+
+    // Don't draw faces of trivial size.
+    if (points -> size() < 1)
+    {
+        return;
+    }
+
+    int len2 = points->size();
+
+    ofPath p = ofPath();
+    p.setStrokeColor(color);
+    p.setStrokeWidth(strokeWidth);
+
+    ofPoint pt = points -> at(0).point;
+    p.moveTo(pt.x, pt.y);
+
+    for (int i2 = 1; i2 < len2; i2++)
+    {
+        ofPoint pt = points -> at(i2).point;
+        p.lineTo(pt.x, pt.y);
+    }
+
+    p.setFilled(filled);
+    p.close();
+    p.draw();
 }
 
 void ofApp::drawPath(vector<ofPoint> &points)
@@ -174,18 +194,39 @@ void ofApp::keyPressed(int key){
         return;
     }
 
+    // Increment current face.
     if(key == 'd')
     {
         // Increment mod len.
-        int len = faces->size();
+        int len = faces -> size();
         num = (num + 1) % len;
     }
 
+    // Decrement current face.
     if(key == 'a')
     {
         // Decrement mod len.
-        int len = faces->size();
+        int len = faces -> size();
         num = (num + len - 1) % len;
+    }
+
+    // Increment face pair.
+    if (key == 'e')
+    {
+        int len = faces -> size();
+        merge_ID_1 = (merge_ID_1 + 1) % len; // merge_ID_2;
+        
+        // Increment the second ID if the first one has completed a cycle.
+        if (merge_ID_1 == 0)
+        {
+            merge_ID_2 = (merge_ID_2 + 1) % len;
+        }
+    }
+
+    // Decrement face pair.
+    if (key == 'q')
+    {
+
     }
 
 }
@@ -229,14 +270,13 @@ void ofApp::mousePressed(int x, int y, int button){
 void ofApp::mouseReleased(int x, int y, int button)
 {
 	computeEmbedding();
-	num = 0;
-	display_input_polyline = false;
+    resetState();
 }
 
 void ofApp::computeEmbedding()
 {
 	// Raw face_vector embedding.
-	// Allocated and deallocated withing this method.
+	// Allocated and deallocated within this method.
 	scrib::Face_Vector_Format * face_vector;
 
 	switch (use_embedder)
@@ -253,7 +293,7 @@ void ofApp::computeEmbedding()
 	delete face_vector;
 
 	cout << faces -> size()      << " faces found." << endl;
-	cout << "Number of Points = " << points.size()   << endl;
+	cout << "Number of Points = " << points.size()  << endl;
 
 }
 
@@ -291,4 +331,34 @@ void ofApp::gotMessage(ofMessage msg){
 //--------------------------------------------------------------
 void ofApp::dragEvent(ofDragInfo dragInfo){
 
+}
+
+void ofApp::updateMergeFaces()
+{
+    if (use_embedder == FACE_FINDER)
+    {
+        return;
+    }
+
+    // Just a normal std::set<> by an aliased name...
+    scrib::ID_Set set;
+    set.insert(merge_ID_1);
+    set.insert(merge_ID_2);
+
+    if (merge_faces != NULL)
+    {
+        delete merge_faces;
+    }
+
+    merge_faces = post_processor.mergeFaces(&set);
+}
+
+void ofApp::drawMergeFaces()
+{
+    //std::vector<scrib::face_info *>
+
+    for (auto iter = merge_faces -> begin(); iter != merge_faces -> end(); iter++)
+    {
+        drawPath(&((*iter) -> points), 128, 5, true);
+    }
 }

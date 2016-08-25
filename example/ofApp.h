@@ -10,6 +10,8 @@ class ofApp : public ofBaseApp{
 		void update();
 		void draw();
 
+        void resetState();
+
 		void keyPressed(int key);
 		void keyReleased(int key);
 		void mouseMoved(int x, int y );
@@ -30,7 +32,7 @@ class ofApp : public ofBaseApp{
 
         bool display_input_polyline;
 
-        std::vector< std::vector<scrib::point_info> *> * faces;
+        scrib::Face_Vector_Format * faces;
 
 
         scrib::FaceFinder segmenter_fast  = scrib::FaceFinder();
@@ -56,6 +58,15 @@ class ofApp : public ofBaseApp{
 
         int num;
 
+        // Stuff for face merging.
+        int merge_ID_1;
+        int merge_ID_2;
+        std::vector<scrib::face_info *> * merge_faces;
+
+        void updateMergeFaces();
+        void   drawMergeFaces();
+
         // Helpful path drawing function.
        void drawPath(vector<ofPoint> &points);
+       void drawPath(scrib::Point_Vector_Format * points, int color, float strokeWidth, bool filled);
 };

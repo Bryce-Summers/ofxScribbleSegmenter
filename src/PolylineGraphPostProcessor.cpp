@@ -77,19 +77,19 @@ namespace scrib
             // Convert the entire face into point info objects.
             do
             {
-                Vertex * vert = current->vertex;
-                Vertex_Data * vert_data = vert->data;
+                Vertex * vert           = current -> vertex;
+                Vertex_Data * vert_data = vert    -> data;
 
                 ofPoint point = vert_data->point;
-                int ID = vert->ID;
+                int ID = vert -> ID;
 
-                face_output->push_back(point_info(point, ID));
+                face_output -> push_back(point_info(point, ID, current));
 
                 // Iterate.
                 current = current->next;
             } while (starting_half_edge != current);
 
-            output->push_back(face_output);
+            output -> push_back(face_output);
         }
 
         return output;
@@ -99,7 +99,7 @@ namespace scrib
     {
         Face_Vector_Format * input = face_vector;
 
-        int len = input->size();
+        int len = input -> size();
 
         for (int index = 0; index < len; index++)
         {
@@ -112,7 +112,7 @@ namespace scrib
         }
     }
 
-    void PolylineGraphPostProcessor::determineNonTrivialAreaFaces(std::vector<int> * output, float min_area)
+    void PolylineGraphPostProcessor::determineNonTrivialAreaFaces(Int_Vector_Format * output, float min_area)
     {
         Face_Vector_Format * input = face_vector;
 
@@ -120,54 +120,54 @@ namespace scrib
 
         for (int index = 0; index < len; index++)
         {
-            float area = computeAreaOfPolygon(input->at(index));
+            float area = computeAreaOfPolygon(input -> at(index));
 
             // Absolute value to account for external faces.
             area = area >= 0 ? (area) : (-area);
 
             if (area >= min_area)
             {
-                output->push_back(index);
+                output -> push_back(index);
             }
         }
     }
 
-    void PolylineGraphPostProcessor::determineTrivialAreaFaces(std::vector<int> * output, float min_area)
+    void PolylineGraphPostProcessor::determineTrivialAreaFaces(Int_Vector_Format * output, float min_area)
     {
         Face_Vector_Format * input = face_vector;
 
-        int len = input->size();
+        int len = input -> size();
 
         for (int index = 0; index < len; index++)
         {
-            float area = computeAreaOfPolygon(input->at(index));
+            float area = computeAreaOfPolygon(input -> at(index));
 
             // Absolute value to account for external faces.
             area = area >= 0 ? (area) : (-area);
 
             if (area < min_area)
             {
-                output->push_back(index);
+                output -> push_back(index);
             }
         }
     }
 
     Face_Vector_Format * PolylineGraphPostProcessor::clipTails()
     {
-        Face_Vector_Format * input = face_vector;
-        Face_Vector_Format * output = new std::vector<std::vector<point_info> *>();
+        Face_Vector_Format * input  = face_vector;
+        Face_Vector_Format * output = new Face_Vector_Format();
 
-        int len = input->size();
+        int len = input -> size();
 
         for (int index = 0; index < len; index++)
         {
-            Point_Vector_Format * unclipped_face = input->at(index);
-            Point_Vector_Format * clipped_face = clipTails(unclipped_face);
+            Point_Vector_Format * unclipped_face = input -> at(index);
+            Point_Vector_Format * clipped_face   = clipTails(unclipped_face);
 
             // Append only non trivial faces to the output.
-            if (clipped_face->size() > 0)
+            if (clipped_face -> size() > 0)
             {
-                output->push_back(clipped_face);
+                output -> push_back(clipped_face);
             }
         }
 
@@ -178,7 +178,7 @@ namespace scrib
     // < 3 point inputs --> 0 point outputs!
     Point_Vector_Format * PolylineGraphPostProcessor::clipTails(Point_Vector_Format * input)
     {
-        std::vector<point_info> * output = new std::vector<point_info>();
+        Point_Vector_Format * output = new Point_Vector_Format();
 
         int len = input -> size();
 
@@ -189,8 +189,8 @@ namespace scrib
             return output; // EMPTY.
         }
 
-        int p_start = (input->at(0)).ID;
-        int p_end = (input->at(len - 1)).ID;
+        int p_start = (input -> at(0)).ID;
+        int p_end   = (input -> at(len - 1)).ID;
 
         // A polygon is closed if it has identical starting and ending points.
         bool closed = (p_start == p_end);
@@ -200,7 +200,7 @@ namespace scrib
         if (closed)
         {
             len -= 1;
-            p_end = (input->at(len - 1)).ID;
+            p_end = (input -> at(len - 1)).ID;
         }
 
         // We again remove input that cannot possibly enclose an area.
@@ -227,24 +227,24 @@ namespace scrib
         {
             // Determine the nearest previous unpruned point, which will be pruned if it is mirrored by the next point.
             int p_previous;
-            non_empty_output = output->size() > 0;
+            non_empty_output = output -> size() > 0;
 
             // A non pruned point exists in the output.
             if (non_empty_output)
             {
-                p_previous = (output->back()).ID;
+                p_previous = (output -> back()).ID;
             }
             else //Otherwise use the unpruned point at the tail of the unpruned list prefix sublist.
             {
-                p_previous = (input->at(len - 1)).ID;
+                p_previous = (input -> at(len - 1)).ID;
             }
 
-            int p_next = (input->at((i + 1) % len)).ID;
+            int p_next = (input -> at((i + 1) % len)).ID;
 
             // If haven't locally detected a tail, then we simply push the point onto the output.
             if (p_previous != p_next)
             {
-                output->push_back(input->at(i%len));
+                output -> push_back(input -> at(i % len));
                 clipped_previous = false;
                 continue;
             }
@@ -255,7 +255,7 @@ namespace scrib
             if (non_empty_output)
             {
                 // Prune output point.
-                output->pop_back();
+                output -> pop_back();
             }
             else
             {
@@ -277,7 +277,7 @@ namespace scrib
         int prune_num = 0;
         while (clipped_previous)// Essentially a while true loop if clipped_previous is true at the end of the first pass.
         {
-            int len = output->size();
+            int len = output -> size();
 
             // Entire face has been pruned.
             if (len < 3)
@@ -285,8 +285,8 @@ namespace scrib
                 return output;
             }
 
-            int p_previous = (output->at(len - 1)).ID;
-            int p_next = (output->at(prune_num + 1)).ID;
+            int p_previous = (output -> at(len - 1)).ID;
+            int p_next = (output -> at(prune_num + 1)).ID;
 
             if (p_previous != p_next)
             {
@@ -295,21 +295,21 @@ namespace scrib
 
             // Prune the head and tail of the output.
             prune_num += 1;
-            output->pop_back();
+            output -> pop_back();
             continue;
         }
 
         // If the wrap pruning pass was done, we need to downsize the array to exclude the no longer relevant data.
         if (clipped_previous)
         {
-            output->erase(output->begin(), output->begin() + prune_num);
+            output -> erase(output -> begin(), output -> begin() + prune_num);
         }
 
         // Here we add the duplicate point if the input was closed.
         if (closed && non_empty_output)
         {
-            point_info start = output->at(0);
-            output->push_back(start);
+            point_info start = output -> at(0);
+            output -> push_back(start);
         }
 
         return output;
@@ -328,14 +328,13 @@ namespace scrib
         {
             Face     * face    = graph -> getFace(*iter);
             Halfedge * start   = face  -> halfedge;
-            Halfedge * current = face->halfedge;
+            Halfedge * current = face  -> halfedge;
             do
             {
-                if (face -> data -> marked == false && _halfedgeInUnion(face_ID_set, current))
+                if (current -> data -> marked == false && _halfedgeInUnion(face_ID_set, current))
                 {
-                    face -> data -> marked = true;
                     face_info * face = _traceUnionFace(face_ID_set, current);
-                    if (!isComplemented(&(face->points)))
+                    if (!isComplemented(&(face -> points)))
                     {
                         face -> complemented = false;
                         faces_uncomplemented.push_back(face);
@@ -346,11 +345,14 @@ namespace scrib
                         faces_complemented.push_back(face);
                     }
                 }
+
+                // Try the next edge.
+                current = current -> next;
             } while (current != start);
         }
 
         // Clear markings.
-        graph -> data -> clearFaceMarks();
+        graph -> data -> clearHalfedgeMarks();
 
         // Now we associate face_info objects with their internal complemented hole objects.
         std::vector<face_info *> * output = new std::vector<face_info *>();
@@ -396,19 +398,68 @@ namespace scrib
         return output;
     }
 
-    bool _halfedgeInUnion(ID_Set * face_ID_set, Halfedge * start)
+    bool PolylineGraphPostProcessor::_halfedgeInUnion(ID_Set * face_ID_set, Halfedge * start)
     {
+        Face * face = start -> face;
+        int face_ID = face  -> ID;
+        ID_Set::const_iterator face_iter = face_ID_set -> find(face_ID);
+
         Face * twin_face = start -> twin -> face;
-        int ID = twin_face -> ID;
-        ID_Set::const_iterator it = face_ID_set -> find(ID);
+        int twin_ID = twin_face -> ID;
+        ID_Set::const_iterator twin_iter = face_ID_set -> find(twin_ID);
 
-        // Twin face not in the set of faces in the union.
-        return it == face_ID_set -> end();
+        // true iff Twin face not in the set of faces in the union.
+        auto END = face_ID_set -> end();
+        return face_iter != END && twin_iter == face_ID_set -> end();
     }
 
-    face_info * _traceUnionFace(ID_Set * face_ID_set, Halfedge * start)
+    face_info * PolylineGraphPostProcessor::_traceUnionFace(ID_Set * face_ID_set, Halfedge * start)
     {
+        face_info * output = new face_info();
+        ID_Set & output_ID_set = output -> faces_ID_set;
 
+        // We only need to worry about tracing output points,
+        // because the holes will associated later on from faces tracede with this function.
+        Point_Vector_Format & output_points = output -> points;
+
+        Halfedge * current = start;
+        do
+        {
+            current -> data -> marked = true;
+
+            // Output current point (with halfedge).
+            point_info current_point = halfedgeToPointInfo(current);
+            output_points.push_back(current_point);
+            int current_face_ID = current -> face -> ID;
+            output_ID_set.insert(current_face_ID);
+
+            // Transition to the next halfedge along this union face.
+            current = nextUnionFace(face_ID_set, current);
+
+        } while (current != start);
+
+        return output;
     }
 
+    Halfedge * PolylineGraphPostProcessor::nextUnionFace(ID_Set * face_ID_Set, Halfedge * current)
+    {
+        // Go around the star backwards.
+        do
+        {
+            current = current -> twin -> prev -> twin;
+
+            // NOTE: since we flip to the twin twice, we stay on the inside or outside face respectively.
+
+        // Keep going until we have come to another halfedge in the output.
+        }while(!_halfedgeInUnion(face_ID_Set, current));
+
+        return current;
+    }
+
+    point_info PolylineGraphPostProcessor::halfedgeToPointInfo(Halfedge * halfedge)
+    {
+        Vertex * vertex           = halfedge -> vertex;
+        Vertex_Data * vertex_data = vertex   -> data;
+        return point_info(vertex_data -> point, vertex -> ID, halfedge);
+    }
 }

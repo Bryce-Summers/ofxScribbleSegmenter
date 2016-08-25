@@ -181,34 +181,39 @@ namespace scrib {
         // Application Specific allocation functions.
         // REQUIRE: All allocation function need the graph to be already instantiated.
 
+        Graph * newGraph()
+        {
+            Graph * output  = new Graph();
+            output -> data  = new Graph_Data(output);
+            return output;
+        }
+
         Face * newFace()
         {
-            Face * output = graph->newFace();
-            output->data = new Face_Data(output);
+            Face * output  = graph -> newFace();
+            output -> data = new Face_Data(output);
             return output;
         };
 
         Edge * newEdge()
         {
-            Edge * output = graph->newEdge();
-            output->data = new Edge_Data(output);
+            Edge * output  = graph -> newEdge();
+            output -> data = new Edge_Data(output);
             return output;
         }
 
         Halfedge * newHalfedge()
         {
-            Halfedge * output = graph->newHalfedge();
-            output->data = new Halfedge_Data(output);
+            Halfedge * output = graph -> newHalfedge();
+            output -> data    = new Halfedge_Data(output);
             return output;
         }
 
         Vertex * newVertex()
         {
-            Vertex * output = graph->newVertex();
-            output->data = new Vertex_Data(output);
+            Vertex * output = graph -> newVertex();
+            output -> data  = new Vertex_Data(output);
             return output;
         }
-
     };
-
 }

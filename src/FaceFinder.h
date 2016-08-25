@@ -70,16 +70,20 @@ namespace scrib {
         // The Output is a list of sub polygons.
         // All of the points given as inputs to this algorithm will be treated as if they were distinct.
         // The points will also be randomly offset by a 'small' amount to prevent the existence of vertical lines.
-        std::vector< // List of Polygons.
+        /*std::vector< // List of Polygons.
             std::vector< // Each polygon is a list of points.
             point_info // Information about the point.
-            > *> * FindFaces(std::vector<ofPoint> * inputs);
+            > *> *
+         */  
+        Face_Vector_Format * FindFaces(std::vector<ofPoint> * inputs);
 
         // Derive faces from a set list of vertex disjoint polyline inputs.
-        std::vector< // List of Polygons.
+        /*std::vector< // List of Polygons.
             std::vector< // Each polygon is a list of points.
             point_info // Information about the Point.
-            > *> * FindFaces(std::vector< std::vector<ofPoint> *> * inputs);
+            > *> *
+         */
+        Face_Vector_Format * FindFaces(std::vector< std::vector<ofPoint> *> * inputs);
 
         // Tells this face finder to interpret the input curve as a line if open and a closed loop if closed.
         // If close, it will consider endpoints as attached to each other.
@@ -90,8 +94,8 @@ namespace scrib {
     private:
 
         // The trivial function constructs the proper output for input polylines of size 1 or 0.
-        inline std::vector<std::vector<point_info> *> * trivial(std::vector<ofPoint> * inputs);
-        inline std::vector<std::vector<point_info> *> * do_the_rest();
+        inline Face_Vector_Format * trivial(std::vector<ofPoint> * inputs);
+        inline Face_Vector_Format * do_the_rest();
 
         bool bUseFastAlgo;
         bool closed_loop;
@@ -116,7 +120,7 @@ namespace scrib {
         void sort_vertice_by_edge_angle(int center_point_index, std::vector<int> * outgoing_indices);
 
         // Uses the computed data structures to construct the set of all cycle lists.
-        std::vector< std::vector<point_info> *> * deriveFaces();
+        Face_Vector_Format * deriveFaces();
 
         /* Outputs the cycle containing the directed edge p1 --> p2, where p2 = dg[p1][p2_index].
         * Traces cycles by always consistently following the rightmost edges.
@@ -125,7 +129,7 @@ namespace scrib {
         * The "output_predicate" structure is used to keep track of which edges have been outputted.
         * Every edge direction is guaranteed to be in exactly one cycle. Each undirected edge can be though of as being in two cycles.
         */
-        std::vector<point_info> * getCycle(int p1, int p2, int p2_index);
+        Point_Vector_Format * getCycle(int p1, int p2, int p2_index);
 
         /* INPUT : the indices of the directed edge p1 --> p2.
         *
