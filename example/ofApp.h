@@ -3,12 +3,20 @@
 #include "ofMain.h"
 #include "PolylineGraphMain.h"
 
+
+/*
+ * Example Scribble Segmentation procedure using the PolylineGraph Embedding and Algorithm Suite.
+ * Written by Bryce Summers on or before 8/27/2016
+ */
+
 class ofApp : public ofBaseApp{
 
 	public:
 		void setup();
 		void update();
 		void draw();
+
+        void resetState();
 
 		void keyPressed(int key);
 		void keyReleased(int key);
@@ -30,7 +38,7 @@ class ofApp : public ofBaseApp{
 
         bool display_input_polyline;
 
-        std::vector< std::vector<scrib::point_info> *> * faces;
+        scrib::Face_Vector_Format * faces;
 
 
         scrib::FaceFinder segmenter_fast  = scrib::FaceFinder();
@@ -38,7 +46,7 @@ class ofApp : public ofBaseApp{
 
 
 		scrib::PolylineGraphEmbedder polyline_embedder;
-		scrib::PolylineGraphPostProcessor post_processor = scrib::PolylineGraphPostProcessor(NULL);
+		scrib::PolylineGraphPostProcessor post_processor;
 
 
 		#define FACE_FINDER 0
@@ -56,6 +64,18 @@ class ofApp : public ofBaseApp{
 
         int num;
 
+        // Stuff for face merging.
+        int merge_ID_1;
+        int merge_ID_2;
+        int merge_ID_3;
+        std::vector<scrib::face_info *> * merge_faces;
+
+        void updateMergeFaces();
+        void   drawMergeFaces();
+
+        std::vector<int> external_faces;
+
         // Helpful path drawing function.
-       void drawPath(vector<ofPoint> &points);
+        void drawPath(vector<ofPoint> &points);
+        void drawPath(scrib::Point_Vector_Format * points, int color, float strokeWidth, bool filled);
 };

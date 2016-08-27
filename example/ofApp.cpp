@@ -1,11 +1,22 @@
 #include "ofApp.h"
 
 //--------------------------------------------------------------
+
+void ofApp::resetState()
+{
+    num = 0;
+    merge_ID_1 = 0;
+    merge_ID_2 = 1;
+    display_input_polyline = false;
+
+    updateMergeFaces();
+}
+
 void ofApp::setup(){
 
-    num = 0;
-
     bool display_input_polyline = true;
+
+    merge_faces = NULL;
 
     // These initial example lists of points represent square-ish shapes.
     /*  |
@@ -41,7 +52,7 @@ void ofApp::setup(){
     external_face_indices.clear();
 
 	post_processor.load_face_vector(faces);
-    post_processor.determineExternalFaces(&external_face_indices);
+    post_processor.determineComplementedFaces(&external_face_indices);
 
 
     cout << "setup done!" << endl;
@@ -63,7 +74,7 @@ void ofApp::setup(){
     len = faces -> size();
     for(int i = 0; i < len; i++)
     {
-        std::vector<scrib::point_info> * polygon = faces->at(i);
+        scrib::Point_Vector_Format * polygon = faces -> at(i);
         int polygon_len = polygon -> size();
 
         cout << "Polygon " << i << endl;
@@ -75,6 +86,9 @@ void ofApp::setup(){
                     ", index = "  << p_info.ID << endl;
         }
     }
+
+    resetState();
+
 }
 
 //--------------------------------------------------------------
@@ -99,33 +113,8 @@ void ofApp::draw(){
 
     for(int i = 0; i < len; i++)
     {
-
-        std::vector<scrib::point_info> * points = faces -> at(i);
-
-        // If the face is of trivial size.
-        if (points -> size() < 1)
-        {
-            continue;
-        }
-
-        int len2 = points->size();
-
-        ofPath p = ofPath();
-        p.setStrokeColor(128);
-        p.setStrokeWidth(1);
-
-        ofPoint pt = points -> at(0).point;
-        p.moveTo(pt.x, pt.y);
-
-        for(int i2 = 1; i2 < len2; i2++)
-        {
-            ofPoint pt = points -> at(i2).point;
-            p.lineTo(pt.x, pt.y);
-        }
-
-        p.setFilled(i == num);
-        p.close();
-        p.draw();
+        scrib::Point_Vector_Format * points = faces->at(i);
+        drawPath(points, 128, 1.0, i == num);
     }
 
     // -- Draw the entire scribble.
@@ -137,9 +126,41 @@ void ofApp::draw(){
 
     //drawPath(points_2);
 
+    drawMergeFaces();
 
     ofDrawBitmapString("Press 'A' and 'D' to cycle left and right through the faces.", 20, 170);
     ofDrawBitmapString("Click and drag the mouse in a wild pattern, then release to test new scribbles!", 20, 200);
+    ofDrawBitmapString("Press 1, 2, and 3 to cycle each of 3 faces that will be unioned (merged) together.", 20, 230);
+
+}
+
+void ofApp::drawPath(scrib::Point_Vector_Format * points, int color, float strokeWidth, bool filled)
+{
+
+    // Don't draw faces of trivial size.
+    if (points -> size() < 1)
+    {
+        return;
+    }
+
+    int len2 = points->size();
+
+    ofPath p = ofPath();
+    p.setStrokeColor(color);
+    p.setStrokeWidth(strokeWidth);
+
+    ofPoint pt = points -> at(0).point;
+    p.moveTo(pt.x, pt.y);
+
+    for (int i2 = 1; i2 < len2; i2++)
+    {
+        ofPoint pt = points -> at(i2).point;
+        p.lineTo(pt.x, pt.y);
+    }
+
+    p.setFilled(filled);
+    p.close();
+    p.draw();
 }
 
 void ofApp::drawPath(vector<ofPoint> &points)
@@ -167,25 +188,74 @@ void ofApp::drawPath(vector<ofPoint> &points)
 }
 
 //--------------------------------------------------------------
-void ofApp::keyPressed(int key){
+void ofApp::keyPressed(int key) {
 
-    if(faces->size() < 1)
+    if (faces -> size() < 1)
     {
         return;
     }
 
-    if(key == 'd')
+    // Increment current face.
+    if (key == 'd')
     {
         // Increment mod len.
         int len = faces->size();
         num = (num + 1) % len;
     }
 
-    if(key == 'a')
+    // Decrement current face.
+    if (key == 'a')
     {
         // Decrement mod len.
-        int len = faces->size();
+        int len = faces -> size();
         num = (num + len - 1) % len;
+    }
+
+    // Increment face pair.
+
+    // Cycle face3.
+    if (key == '1')
+    {
+        int len = faces -> size();
+        int external_ID = external_faces.at(0);
+
+        // cycles the 1st face ID to the next non complemented face.
+        do
+        {
+            merge_ID_1 = (merge_ID_1 + 1) % len; // merge_ID_2;
+        } while (merge_ID_1 == external_ID);
+
+        this -> updateMergeFaces();
+    }
+
+    // Cycle face 2.
+    if (key == '2')
+    {
+        int len = faces -> size();
+        int external_ID = external_faces.at(0);
+
+        // Cycle 2nd merge face to next uncomplemented face.
+        do
+        {
+            merge_ID_2 = (merge_ID_2 + 1) % len; // merge_ID_2;
+        } while (merge_ID_2 == external_ID);
+
+        this -> updateMergeFaces();
+    }
+
+    // Decrement face pair.
+    if (key == '3')
+    {
+        int len = faces -> size();
+        int external_ID = external_faces.at(0);
+
+        // Cycle 2nd merge face to next uncomplemented face.
+        do
+        {
+            merge_ID_3 = (merge_ID_3 + 1) % len; // merge_ID_3;
+        } while (merge_ID_3 == external_ID);
+
+        this -> updateMergeFaces();
     }
 
 }
@@ -228,15 +298,14 @@ void ofApp::mousePressed(int x, int y, int button){
 
 void ofApp::mouseReleased(int x, int y, int button)
 {
-	computeEmbedding();
-	num = 0;
-	display_input_polyline = false;
+    resetState();
+	computeEmbedding();    
 }
 
 void ofApp::computeEmbedding()
 {
 	// Raw face_vector embedding.
-	// Allocated and deallocated withing this method.
+	// Allocated and deallocated within this method.
 	scrib::Face_Vector_Format * face_vector;
 
 	switch (use_embedder)
@@ -250,11 +319,17 @@ void ofApp::computeEmbedding()
 
 	post_processor.load_face_vector(face_vector);
 	this -> faces = post_processor.clipTails();
+    post_processor.load_face_vector(this -> faces);
 	delete face_vector;
+    
 
 	cout << faces -> size()      << " faces found." << endl;
-	cout << "Number of Points = " << points.size()   << endl;
+	cout << "Number of Points = " << points.size()  << endl;
 
+    external_faces.clear();
+    post_processor.determineComplementedFaces(&external_faces);
+
+    this -> updateMergeFaces();
 }
 
 // Derives a face vector using the FaceFinder.
@@ -270,6 +345,7 @@ scrib::Face_Vector_Format * ofApp::processUsingFaceFinder()
 scrib::Face_Vector_Format * ofApp::processUsingGraphEmbedder()
 {
 	scrib::Graph * graph      = polyline_embedder.embedPolyline(&points);
+    post_processor.freeGraph();
 	post_processor.load_graph(graph);
 	scrib::Face_Vector_Format * face_vector = post_processor.convert_to_face_vectors();
 	
@@ -291,4 +367,36 @@ void ofApp::gotMessage(ofMessage msg){
 //--------------------------------------------------------------
 void ofApp::dragEvent(ofDragInfo dragInfo){
 
+}
+
+void ofApp::updateMergeFaces()
+{
+    if (use_embedder == FACE_FINDER)
+    {
+        return;
+    }
+
+    cout << "Merging Faces " << merge_ID_1 << " AND " << merge_ID_2 << " AND " << merge_ID_3 << endl;
+
+    // Just a normal std::set<> by an aliased name...
+    scrib::ID_Set set;
+    set.insert(merge_ID_1);
+    set.insert(merge_ID_2);
+    set.insert(merge_ID_3);
+
+    if (merge_faces != NULL)
+    {
+        delete merge_faces;
+    }
+
+    merge_faces = post_processor.mergeFaces(&set);
+}
+
+void ofApp::drawMergeFaces()
+{
+
+    for (auto iter = merge_faces -> begin(); iter != merge_faces -> end(); iter++)
+    {
+        drawPath(&((*iter) -> points), 128, 5, false);
+    }
 }

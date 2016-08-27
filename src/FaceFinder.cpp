@@ -7,7 +7,7 @@ namespace scrib {
         closed_loop = isClosed;
     }
 
-    std::vector< std::vector<point_info> *> * FaceFinder::FindFaces(std::vector< std::vector<ofPoint> *> * inputs)
+    Face_Vector_Format * FaceFinder::FindFaces(std::vector< std::vector<ofPoint> *> * inputs)
     {
         // Make sure that the previous data is cleared.
         int len = inputs->size();
@@ -19,7 +19,7 @@ namespace scrib {
         return do_the_rest();
     }
 
-    std::vector< std::vector<point_info> *> * FaceFinder::FindFaces(std::vector<ofPoint> * inputs)
+    Face_Vector_Format * FaceFinder::FindFaces(std::vector<ofPoint> * inputs)
     {
         // Handle Trivial Input.
         if (inputs->size() <= 1)
@@ -33,9 +33,9 @@ namespace scrib {
         return do_the_rest();
     }
 
-    inline std::vector<std::vector<point_info> *> * FaceFinder::trivial(std::vector<ofPoint> * inputs)
+    inline Face_Vector_Format * FaceFinder::trivial(std::vector<ofPoint> * inputs)
     {
-        std::vector< std::vector<point_info> *> * output = new std::vector< std::vector<point_info> *>();
+        Face_Vector_Format * output = new Face_Vector_Format();
 
         if (inputs->size() < 1)
         {
@@ -43,22 +43,22 @@ namespace scrib {
         }
 
         // 1 point face.
-        std::vector<point_info> * face = new std::vector<point_info>();
+        Point_Vector_Format * face = new Point_Vector_Format();
 
         // Create the one point.
-        face->push_back(point_info(inputs->at(0), 0));
+        face -> push_back(point_info(inputs->at(0), 0));
 
-        output->push_back(face);
+        output -> push_back(face);
         return output;
     }
 
-    inline std::vector<std::vector<point_info> *> * FaceFinder::do_the_rest()
+    inline Face_Vector_Format * FaceFinder::do_the_rest()
     {
         splitIntersectionPoints();
         convert_to_directedGraph();
         sort_graph_by_edge_angle();
 
-        std::vector< std::vector<point_info> *> * output = deriveFaces();
+        Face_Vector_Format * output = deriveFaces();
 
         cleanup();
 
@@ -233,10 +233,10 @@ namespace scrib {
 
     }
 
-    std::vector< std::vector<point_info> *> * FaceFinder::deriveFaces()
+    Face_Vector_Format * FaceFinder::deriveFaces()
     {
         // -- Initialize Output Structures.
-        std::vector< std::vector<point_info> *> * output = new std::vector< std::vector<point_info> *>();
+        Face_Vector_Format * output = new Face_Vector_Format();
 
         // For all edges, output their cycle once.
 
@@ -260,16 +260,16 @@ namespace scrib {
                 }
 
                 int p2 = outgoing_vertices->at(edge_index);
-                output->push_back(getCycle(point_index, p2, edge_index));
+                output -> push_back(getCycle(point_index, p2, edge_index));
             }
         }
 
         return output;
     }
 
-    std::vector<point_info> * FaceFinder::getCycle(int p1_original, int p2_original, int p2_original_outgoing_index)
+    Point_Vector_Format * FaceFinder::getCycle(int p1_original, int p2_original, int p2_original_outgoing_index)
     {
-        std::vector<point_info> * output = new std::vector<point_info>();
+        Point_Vector_Format * output = new Point_Vector_Format();
 
         int i1 = p1_original;
         int i2 = p2_original;

@@ -20,8 +20,16 @@ namespace scrib
 
         Graph_Data(Graph * graph)
         {
-            this->graph = graph;
+            this -> graph = graph;
         }
+
+        void clearFaceMarks();
+        void clearVertexMarks();
+        void clearEdgeMarks();
+        void clearHalfedgeMarks();
+
+        void clearMarks();
+
     };
 
     class Face_Data
@@ -33,7 +41,7 @@ namespace scrib
 
         Face_Data(Face * face)
         {
-            this->face = face;
+            this -> face = face;
         }
 
         bool marked = false;

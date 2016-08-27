@@ -42,10 +42,10 @@ namespace scrib
     // Iterators for accessing the elements from the Graph object.
     // FIXME: I may wish to use lists instead of vectors if I ever wish to delete objects.
     // For now they are great because they allow random access to the elements by ID.
-    typedef   vector<Vertex>::iterator   Vertex_Iter;
-    typedef   vector<Edge>::iterator     Edge_Iter;
-    typedef   vector<Face>::iterator     Face_Iter;
-    typedef   vector<Halfedge>::iterator Halfedge_Iter;
+    typedef   vector<Vertex *>::iterator   Vertex_Iter;
+    typedef   vector<Edge *>::iterator     Edge_Iter;
+    typedef   vector<Face *>::iterator     Face_Iter;
+    typedef   vector<Halfedge *>::iterator Halfedge_Iter;
 
     // -- Associated Data.
     // The classes will be defined in application specific files so that this halfedge mesh header file may be reused.
@@ -78,10 +78,11 @@ namespace scrib
 
     private:
 
-        std::vector<Face>   faces;
-        std::vector<Vertex> vertices;
-        std::vector<Edge>   edges;
-        std::vector<Halfedge> halfedges;
+        // Note: We use pointers, because then the location on the heap for the elements is permanant.
+        std::vector<Face *>    faces;
+        std::vector<Vertex *>  vertices;
+        std::vector<Edge *>    edges;
+        std::vector<Halfedge*> halfedges;
 
     public:
 
@@ -101,22 +102,22 @@ namespace scrib
 
         Face * getFace(int ID)
         {
-            return &faces[ID];
+            return faces[ID];
         }
 
         Vertex * getVertex(int ID)
         {
-            return &vertices[ID];
+            return vertices[ID];
         }
 
         Edge * getEdge(int ID)
         {
-            return &edges[ID];
+            return edges[ID];
         }
 
         Halfedge * getHalfedge(int ID)
         {
-            return &halfedges[ID];
+            return halfedges[ID];
         }
 
         size_t numFaces()
@@ -152,7 +153,7 @@ namespace scrib
         Edge_Iter edgesEnd() { return edges.end(); }
 
         Halfedge_Iter halfedgesBegin() { return halfedges.begin(); }
-        Halfedge_Iter halfedgesEnd() { return halfedges.end(); }
+        Halfedge_Iter halfedgesEnd()   { return halfedges.end();   }
 
     };
 
