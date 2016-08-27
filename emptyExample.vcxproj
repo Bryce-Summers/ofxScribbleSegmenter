@@ -190,6 +190,7 @@
     <ClCompile Include="src\Intersector.cpp" />
     <ClCompile Include="src\Line.cpp" />
     <ClCompile Include="src\OffsetCurves.cpp" />
+    <ClCompile Include="src\PolylineGraphData.cpp" />
     <ClCompile Include="src\PolylineGraphEmbedder.cpp" />
     <ClCompile Include="src\PolylineGraphPostProcessor.cpp" />
   </ItemGroup>

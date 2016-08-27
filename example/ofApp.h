@@ -71,7 +71,7 @@ class ofApp : public ofBaseApp{
         std::vector<scrib::face_info *> * merge_faces;
 
         void updateMergeFaces();
-        void   drawMergeFaces();
+        void   drawMergeFaces(std::vector<scrib::face_info *> * faces, int thickness);
 
         std::vector<int> external_faces;
 
