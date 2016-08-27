@@ -2,23 +2,28 @@
 #define FACEFINDER_H
 
 /*
- * Finds Face regions from a given contiguous polyline.
- *
- * Written by Bryce Summers.
- * 6/26/2015.
- */
+* Transforms a set of input polylines into a planar graph embedding.
+*
+* Written by Bryce Summers.
+* 6/26/2015: Wrote Original.
+* 8/16/2016: Rewrote as PlanarGraphEmbedder in order to output full graph embeddings using a half edge structure.
+*            This class remains as a very focused class.
+* 8/18/2016: Post proccessing operations have been moved to PolylineGraphEmbedder
+*
+* Written for the STUDIO for Creative Inquiry at Carnegie Mellon University.
+*/
 
 #include <vector>
 #include "ofMain.h"
 #include "Line.h"
 #include "Intersector.h"
-#include "CurveFunctions.h"
+#include "PolylineGraphPostProcessor.h" // point_info definition.
 
-namespace scrib{
+namespace scrib {
 
 
-class FaceFinder
-{
+    class FaceFinder
+    {
     public:
 
         // A User can explicitly pass false to force the intersection points to be found using a brute force algorithm that
@@ -29,38 +34,36 @@ class FaceFinder
             bUseFastAlgo = useFastAlgo;
             closed_loop = false;
         };
-        virtual ~FaceFinder(){};
+        virtual ~FaceFinder() {};
 
 
         /* -- Here is the interface for calling the built in algorithms for the Scribble segmenter.
-         * These algorithms include:
-         * Preprocessing:
-         * [EMPTY]
-         *
-         * Main Algorithm:
-         * 1. The main algorithm for embedding a set of polylines in space and determining the set of non chordal cycles in the
-         *    associated embedded planar graph.
-         *
-         * - A polygon is closed if it has identical starting and ending points and open otherwise.
-         *   The algorithm may be configured to output either open or closed polygons based on the closed_loop mode state.
-         *
-         * FIXME: If a user draws a second line completely around an original line, then their will be faces defined by both an external
-         *        face on the original polyline embedding and an internal face on the new enclosing embedding.
-         *        This may invalidate some users' assumptions of a global planar graph embedding without any holes.
-         *
-         * Post Processing:
-         * 1. Determine internal and external faces. (Initial Release)
-         * 2. Determine trivial and non trivial area faces according to a constant area threshold value. (8/11/2016)
-         *    (If you can't think of any good constant values, you might want to look at the field of
-         *     Topological Data Analysis and their 'barcode' concept: https://en.wikipedia.org/wiki/Topological_data_analysis.
-         * 3. Clipping off tails, i.e. portions of faces that enclose 0 area. (8/11/2016)
-         *    This could potentially be put into the getCycle function, but I think that it is best to make this a dedicated post processing step instead
-         *    in order to preserve the simplicity of the main algorithm.
-         *    This algorithm properly handles faces with either duplicated or non-duplicated starting and ending points.
-         *    i.e. Those produced in open and closed mode.
-         */
-
-
+        * These algorithms include:
+        * Preprocessing:
+        * [EMPTY]
+        *
+        * Main Algorithm:
+        * 1. The main algorithm for embedding a set of polylines in space and determining the set of non chordal cycles in the
+        *    associated embedded planar graph.
+        *
+        * - A polygon is closed if it has identical starting and ending points and open otherwise.
+        *   The algorithm may be configured to output either open or closed polygons based on the closed_loop mode state.
+        *
+        * FIXME: If a user draws a second line completely around an original line, then their will be faces defined by both an external
+        *        face on the original polyline embedding and an internal face on the new enclosing embedding.
+        *        This may invalidate some users' assumptions of a global planar graph embedding without any holes.
+        *
+        * Post Processing:
+        * 1. Determine internal and external faces. (Initial Release)
+        * 2. Determine trivial and non trivial area faces according to a constant area threshold value. (8/11/2016)
+        *    (If you can't think of any good constant values, you might want to look at the field of
+        *     Topological Data Analysis and their 'barcode' concept: https://en.wikipedia.org/wiki/Topological_data_analysis.
+        * 3. Clipping off tails, i.e. portions of faces that enclose 0 area. (8/11/2016)
+        *    This could potentially be put into the getCycle function, but I think that it is best to make this a dedicated post processing step instead
+        *    in order to preserve the simplicity of the main algorithm.
+        *    This algorithm properly handles faces with either duplicated or non-duplicated starting and ending points.
+        *    i.e. Those produced in open and closed mode.
+        */
 
         // Derive faces from a single polyline input.
         // No guarantee is made about the order of the polygons.
@@ -68,36 +71,15 @@ class FaceFinder
         // All of the points given as inputs to this algorithm will be treated as if they were distinct.
         // The points will also be randomly offset by a 'small' amount to prevent the existence of vertical lines.
         std::vector< // List of Polygons.
-        std::vector< // Each polygon is a list of points.
-        point_info // Information about the point.
-        > *> * FindFaces(std::vector<ofPoint> * inputs);
+            std::vector< // Each polygon is a list of points.
+            point_info // Information about the point.
+            > *> * FindFaces(std::vector<ofPoint> * inputs);
 
         // Derive faces from a set list of vertex disjoint polyline inputs.
         std::vector< // List of Polygons.
-        std::vector< // Each polygon is a list of points.
-        point_info // Information about the Point.
-        > *> * FindFaces(std::vector< std::vector<ofPoint> *> * inputs);
-
-        // -- Post processing algorithms.
-
-        // Appends the indices of any external faces amongst the input list of faces to the output vector.
-        // NOTE : The input type is equivelant to the output type of the face finding functions,
-        // so using this function may be a natural extension of using the original functions.
-        void determineExternalFaces(std::vector<std::vector<point_info> *> * input, std::vector<int> * output);
-
-        // Appends to output the indices of the faces of **NonTrivial** Area (area >= min_area)
-        void determineNonTrivialAreaFaces(std::vector<std::vector<point_info> *> * input, std::vector<int> * output, float min_area);
-        // Appends to output the indices of the faces of **Trivial** Area (area < min_area)
-        void determineTrivialAreaFaces(std::vector<std::vector<point_info> *> * input, std::vector<int> * output, float min_area);
-
-        // Input: a set of faces, Output: a new set of faces that have no trivial contiguous subfaces.
-        // ENSURES: Polygons will be output either open or closed in the manner that they are passed in.
-        // ENSURES: Omits faces consisting of only a single long tail.
-        std::vector<std::vector<point_info> *> * clipTails(std::vector<std::vector<point_info> *> * input);
-
-        // Returns a copy of the single input face without any trivial area contiguous subfaces. (Tails)
-        // May return a 0 point polyline if the input line is non-intersecting.
-        std::vector<point_info> * clipTails(std::vector<point_info> * input);
+            std::vector< // Each polygon is a list of points.
+            point_info // Information about the Point.
+            > *> * FindFaces(std::vector< std::vector<ofPoint> *> * inputs);
 
         // Tells this face finder to interpret the input curve as a line if open and a closed loop if closed.
         // If close, it will consider endpoints as attached to each other.
@@ -137,19 +119,19 @@ class FaceFinder
         std::vector< std::vector<point_info> *> * deriveFaces();
 
         /* Outputs the cycle containing the directed edge p1 --> p2, where p2 = dg[p1][p2_index].
-         * Traces cycles by always consistently following the rightmost edges.
-         * (It could be leftmost and would still work as long as it is consistently left or consistently right, but not mixed...)
-         * All edges are traced twice, once in each direction. For planar directed graphs, this is guaranteed to produce every cycle.
-         * The "output_predicate" structure is used to keep track of which edges have been outputted.
-         * Every edge direction is guaranteed to be in exactly one cycle. Each undirected edge can be though of as being in two cycles.
-         */
+        * Traces cycles by always consistently following the rightmost edges.
+        * (It could be leftmost and would still work as long as it is consistently left or consistently right, but not mixed...)
+        * All edges are traced twice, once in each direction. For planar directed graphs, this is guaranteed to produce every cycle.
+        * The "output_predicate" structure is used to keep track of which edges have been outputted.
+        * Every edge direction is guaranteed to be in exactly one cycle. Each undirected edge can be though of as being in two cycles.
+        */
         std::vector<point_info> * getCycle(int p1, int p2, int p2_index);
 
         /* INPUT : the indices of the directed edge p1 --> p2.
-         *
-         * OUTPUT : the indice pointers will point to the new directed edge p1' --> p2'
-         * NOTE : Indices are integers corresponding to the location in the global points array for each point.
-         */
+        *
+        * OUTPUT : the indice pointers will point to the new directed edge p1' --> p2'
+        * NOTE : Indices are integers corresponding to the location in the global points array for each point.
+        */
         void getNextEdge(int * p1_index, int * p2_index, int * outgoing_index);
 
         // Sets the predicate associated with the given directed edge.
@@ -182,7 +164,7 @@ class FaceFinder
         // false --> proccess this edge, it is part of a cycle that has not yet been output.
         std::map<int, std::vector<bool> *> output_predicate;
 
-};
+    };
 
 }
 

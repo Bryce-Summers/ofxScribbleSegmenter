@@ -10,10 +10,17 @@ tmp/
 *.tmp
 *.bak
 *.swp
+*.db
 *~.nib
 local.properties
 .classpath
 .settings/
+
+# Visual Studio Databases.
+.opendb
+.db
+.VC.VC.opendb
+
 .loadpath
 
 # External tool builders

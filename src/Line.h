@@ -5,14 +5,15 @@
 #include "ofMain.h"
 
 /**
- * Line Representation and methods class.
- * First Draft completed by Bryce Summers on 7/14/2015.
- */
+* Line Representation and methods class.
+* First Draft completed by Bryce Summers on 7/14/2015.
+*/
 
-namespace scrib{
-
-class Line
+namespace scrib
 {
+
+    class Line
+    {
     public:
 
         // Constructor.
@@ -20,9 +21,9 @@ class Line
         virtual ~Line();
 
         /** Intersects the given line with this line.
-         *  Adds a split point if they do intersect.
-         *  Any created split points are added to the referenced global collection of points.
-         */
+        *  Adds a split point if they do intersect.
+        *  Any created split points are added to the referenced global collection of points.
+        */
         bool intersect(Line * other);
 
         // Returns a signed floating point number indicating which direction the given point is relative to this line.
@@ -30,6 +31,7 @@ class Line
 
         // Appends all of the split set of lines in order to the output vector.
         // Adds itself if it does not contain any split lines.
+        // Line pts are oriented along the polyline, such that p1 comes before p2 in the polyline + intersection point ordering.
         void getSplitLines(std::vector<Line> * lines_collector);
 
         // This function should only be called after a call to intersect has returned true.
@@ -63,7 +65,7 @@ class Line
         inline bool detect_intersection(Line * other);
         inline void report_intersection(Line * other);
 
-};
+    };
 
 }
 

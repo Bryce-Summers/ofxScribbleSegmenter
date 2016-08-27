@@ -1,8 +1,7 @@
 #pragma once
 
 #include "ofMain.h"
-#include "../src/FaceFinder.h"
-#include "../src/OffsetCurves.h"
+#include "PolylineGraphMain.h"
 
 class ofApp : public ofBaseApp{
 
@@ -31,11 +30,29 @@ class ofApp : public ofBaseApp{
 
         bool display_input_polyline;
 
-        std::vector< std::vector<scrib::point_info> *> * shapes;
+        std::vector< std::vector<scrib::point_info> *> * faces;
 
 
         scrib::FaceFinder segmenter_fast  = scrib::FaceFinder();
         scrib::FaceFinder segmenter_brute = scrib::FaceFinder(false);
+
+
+		scrib::PolylineGraphEmbedder polyline_embedder;
+		scrib::PolylineGraphPostProcessor post_processor = scrib::PolylineGraphPostProcessor(NULL);
+
+
+		#define FACE_FINDER 0
+		#define POLYLINE_GRAPH_EMBEDDER 1
+
+		const int use_embedder = POLYLINE_GRAPH_EMBEDDER;
+
+		// Computes an embedding using the desired embedder.
+		// Converts this -> points to this->shapes.
+		// Chooses an embedder based off of the value of this->use_embedder
+		void computeEmbedding();
+		scrib::Face_Vector_Format * processUsingFaceFinder();
+		scrib::Face_Vector_Format * processUsingGraphEmbedder();
+
 
         int num;
 
