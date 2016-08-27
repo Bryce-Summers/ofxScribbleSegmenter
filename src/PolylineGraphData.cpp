@@ -7,7 +7,7 @@ namespace scrib
     {
         for (Face_Iter iter = graph->facesBegin(); iter != graph->facesEnd(); iter++)
         {
-            iter -> data -> marked = false;
+            (*iter) -> data -> marked = false;
         }
     }
 
@@ -15,7 +15,7 @@ namespace scrib
     {
         for (Vertex_Iter iter = graph->verticesBegin(); iter != graph->verticesEnd(); iter++)
         {
-            iter -> data -> marked = false;
+            (*iter) -> data -> marked = false;
         }
     }
 
@@ -23,7 +23,7 @@ namespace scrib
     {
         for (Edge_Iter iter = graph->edgesBegin(); iter != graph->edgesEnd(); iter++)
         {
-            iter -> data -> marked = false;
+            (*iter) -> data -> marked = false;
         }
     }
 
@@ -31,7 +31,7 @@ namespace scrib
     {
         for (Halfedge_Iter iter = graph->halfedgesBegin(); iter != graph->halfedgesEnd(); iter++)
         {
-            iter -> data -> marked = false;
+            (*iter) -> data -> marked = false;
         }
     }
 

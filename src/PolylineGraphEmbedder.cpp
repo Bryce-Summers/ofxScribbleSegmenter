@@ -270,7 +270,7 @@ namespace scrib {
         Vertex_Iter end   = graph -> verticesEnd();
         for (Vertex_Iter iter = start; iter != end; iter++)
         {
-            Vertex_Data * vert_data = iter -> data;
+            Vertex_Data * vert_data = (*iter) -> data;
             std::vector<Halfedge *> & outgoing_edges = vert_data -> outgoing_edges;
             sort_outgoing_edges(outgoing_edges);
         }
@@ -343,7 +343,7 @@ namespace scrib {
         Vertex_Iter end   = graph -> verticesEnd();
         for (Vertex_Iter vert = start; vert != end; vert++)
         {
-            Vertex_Data * vert_data           = vert -> data;
+            Vertex_Data * vert_data           = (*vert) -> data;
             vector<Halfedge *> outgoing_edges = vert_data -> outgoing_edges;
             int degree = outgoing_edges.size();
 
@@ -352,7 +352,7 @@ namespace scrib {
             {
                 vert_data -> singleton_point = true;
 
-                Halfedge * halfedge = vert -> halfedge;
+                Halfedge * halfedge = (*vert) -> halfedge;
                 // ASSERTION: halfedge != null. If construction the user inputs a graph with singleton points.
                 // FIXME: Perhaps I should allocate the half edge here for the trivial case. Maybe I should combine the
                 // places in my code where I define the singleton state.
@@ -367,7 +367,7 @@ namespace scrib {
             {
                 vert_data -> tail_point = true;
 
-                Halfedge * out = vert -> halfedge;
+                Halfedge * out = (*vert) -> halfedge;
                 Halfedge * in  = out  -> twin;
 
                 out -> prev = in;
@@ -389,8 +389,11 @@ namespace scrib {
 
                 // This combined with the sort order determines the consistent orientation.
                 // I think that it defines a clockwise orientation, but I could be wrong.
+                
+                // FIXME: There is something wrong about this ordering.
+
                 in  -> next  = outgoing_edges[(i + 1) % degree];
-                out -> prev  = outgoing_edges[(i + degree - 1) % degree];
+                out -> prev  = outgoing_edges[(i + degree - 1) % degree] -> twin;
             }
 
             continue;
@@ -408,7 +411,7 @@ namespace scrib {
         // Iterate through all originating points.
         for (Halfedge_Iter halfedge = start; halfedge != end; halfedge++)
         {
-            Halfedge_Data * halfedge_data = halfedge -> data;
+            Halfedge_Data * halfedge_data = (*halfedge) -> data;
 
             // Avoid previously traced cycles.
             if (halfedge_data -> marked)
@@ -418,14 +421,14 @@ namespace scrib {
 
             Face * face = newFace(); // GraphEmbedder::newFace() ...
 
-            face -> halfedge = &(*halfedge);
+            face -> halfedge = *halfedge;
             trace_face(face);
         }
 
         // Clear the marks.
         graph -> data -> clearHalfedgeMarks();
 
-        return graph;
+        return this -> graph;
     }
 
     // Isn't this nice and conscise?

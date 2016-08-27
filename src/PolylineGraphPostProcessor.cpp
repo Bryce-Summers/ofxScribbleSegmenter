@@ -71,7 +71,7 @@ namespace scrib
         {
             Point_Vector_Format * face_output = new Point_Vector_Format();
 
-            Halfedge * starting_half_edge = face->halfedge;
+            Halfedge * starting_half_edge = (*face) -> halfedge;
             Halfedge * current = starting_half_edge;
 
             // Convert the entire face into point info objects.
@@ -409,8 +409,15 @@ namespace scrib
         ID_Set::const_iterator twin_iter = face_ID_set -> find(twin_ID);
 
         // true iff Twin face not in the set of faces in the union.
-        auto END = face_ID_set -> end();
-        return face_iter != END && twin_iter == face_ID_set -> end();
+        auto NOT_FOUND = face_ID_set -> end();
+
+        // Handle in Union Tail edges.
+        if (face_iter != NOT_FOUND && face_ID == twin_ID)
+        {
+            //return true;
+        }
+
+        return face_iter != NOT_FOUND && twin_iter == NOT_FOUND;
     }
 
     face_info * PolylineGraphPostProcessor::_traceUnionFace(ID_Set * face_ID_set, Halfedge * start)
@@ -444,14 +451,18 @@ namespace scrib
     Halfedge * PolylineGraphPostProcessor::nextUnionFace(ID_Set * face_ID_Set, Halfedge * current)
     {
         // Go around the star backwards.
-        do
+
+        // Transition from the incoming current edge to the backmost candidate outgoing edge.
+        current = current -> twin -> prev -> twin;
+        
+        // NOTE: WE could theoretically put in an infinite loop check here, because this code will fail if the graph is malformed.
+
+        // Keep trying out candidate outgoing faces, until we find the first one that works.
+        while(!_halfedgeInUnion(face_ID_Set, current))
         {
-            current = current -> twin -> prev -> twin;
-
-            // NOTE: since we flip to the twin twice, we stay on the inside or outside face respectively.
-
-        // Keep going until we have come to another halfedge in the output.
-        }while(!_halfedgeInUnion(face_ID_Set, current));
+            // The cycling operations come in two forms, since we flip our orientation after each path change attempt.
+            current = current -> prev -> twin;   
+        }
 
         return current;
     }

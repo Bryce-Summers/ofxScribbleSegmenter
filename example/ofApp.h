@@ -61,12 +61,15 @@ class ofApp : public ofBaseApp{
         // Stuff for face merging.
         int merge_ID_1;
         int merge_ID_2;
+        int merge_ID_3;
         std::vector<scrib::face_info *> * merge_faces;
 
         void updateMergeFaces();
         void   drawMergeFaces();
 
+        std::vector<int> external_faces;
+
         // Helpful path drawing function.
-       void drawPath(vector<ofPoint> &points);
-       void drawPath(scrib::Point_Vector_Format * points, int color, float strokeWidth, bool filled);
+        void drawPath(vector<ofPoint> &points);
+        void drawPath(scrib::Point_Vector_Format * points, int color, float strokeWidth, bool filled);
 };

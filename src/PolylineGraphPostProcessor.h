@@ -115,7 +115,7 @@ namespace scrib
 
     private:
         // Data.
-        Graph * graph;
+        Graph * graph = NULL;
 
         // Face point vector format. // FIXME: Consider using smart pointers.
         Face_Vector_Format * face_vector = NULL;
@@ -136,7 +136,16 @@ namespace scrib
 
         void load_graph(Graph * graph)
         {
-            this->graph = graph;
+            this -> graph = graph;
+        }
+
+        void freeGraph()
+        {
+            if(this -> graph != NULL)
+            {
+                delete this -> graph;
+                this -> graph = NULL;
+            }
         }
 
 
@@ -171,6 +180,7 @@ namespace scrib
         
         // Returns true iff the given hafedge is included in the output of the union of the given faces.
         // I.E. returns true iff the given half edge -> face is within the set of unioned faces and half_edge->twin -> face is not.
+        // Tail edges, where the halfedge and its twin are on the same face are not considered to be in a halfedgeUnion face.
         bool _halfedgeInUnion(ID_Set * face_ID_set, Halfedge * start);
 
         // Given an In Union halfege, traces its face_info union face information.
