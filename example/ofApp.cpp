@@ -52,7 +52,7 @@ void ofApp::setup(){
     external_face_indices.clear();
 
 	post_processor.load_face_vector(faces);
-    post_processor.determineExternalFaces(&external_face_indices);
+    post_processor.determineComplementedFaces(&external_face_indices);
 
 
     cout << "setup done!" << endl;
@@ -327,7 +327,7 @@ void ofApp::computeEmbedding()
 	cout << "Number of Points = " << points.size()  << endl;
 
     external_faces.clear();
-    post_processor.determineExternalFaces(&external_faces);
+    post_processor.determineComplementedFaces(&external_faces);
 
     this -> updateMergeFaces();
 }

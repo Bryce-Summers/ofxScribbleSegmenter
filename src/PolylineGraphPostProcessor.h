@@ -106,11 +106,7 @@ namespace scrib
     {
 
     public:
-        PolylineGraphPostProcessor(Graph * graph = NULL)
-        {
-            this->graph = graph;
-        }
-
+        PolylineGraphPostProcessor() {}
         virtual ~PolylineGraphPostProcessor() {}
 
     private:
@@ -131,7 +127,16 @@ namespace scrib
         // It is up to the user to load the proper face vector when they need a change.
         void load_face_vector(Face_Vector_Format * face_vector_format)
         {
-            this->face_vector = face_vector_format;
+            this -> face_vector = face_vector_format;
+        }
+
+        void free_face_vector()
+        {
+            if (this -> face_vector != NULL)
+            {
+                delete this -> face_vector;
+                this -> face_vector = NULL;
+            }
         }
 
         void load_graph(Graph * graph)
@@ -154,7 +159,7 @@ namespace scrib
         // Appends the indices of any external faces amongst the input list of faces to the output vector.
         // NOTE : The input type is equivelant to the output type of the face finding functions,
         // so using this function may be a natural extension of using the original functions.
-        void determineExternalFaces(std::vector<int> * output);
+        void determineComplementedFaces(std::vector<int> * output);
 
         // Appends to output the indices of the faces of **NonTrivial** Area (area >= min_area)
         void determineNonTrivialAreaFaces(Int_Vector_Format * output, float min_area);

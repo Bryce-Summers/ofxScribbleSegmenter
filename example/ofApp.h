@@ -3,6 +3,12 @@
 #include "ofMain.h"
 #include "PolylineGraphMain.h"
 
+
+/*
+ * Example Scribble Segmentation procedure using the PolylineGraph Embedding and Algorithm Suite.
+ * Written by Bryce Summers on or before 8/27/2016
+ */
+
 class ofApp : public ofBaseApp{
 
 	public:
@@ -40,7 +46,7 @@ class ofApp : public ofBaseApp{
 
 
 		scrib::PolylineGraphEmbedder polyline_embedder;
-		scrib::PolylineGraphPostProcessor post_processor = scrib::PolylineGraphPostProcessor(NULL);
+		scrib::PolylineGraphPostProcessor post_processor;
 
 
 		#define FACE_FINDER 0

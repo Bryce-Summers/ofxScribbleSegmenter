@@ -96,7 +96,7 @@ namespace scrib
         post.load_face_vector(faces);
 
         std::vector<int> external_face_indices;
-        post.determineExternalFaces(&external_face_indices);
+        post.determineComplementedFaces(&external_face_indices);
 
         // Get the index of the 1 external face.
         int output_index = external_face_indices[0];

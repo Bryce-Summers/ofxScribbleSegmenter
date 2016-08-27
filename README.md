@@ -116,3 +116,13 @@ Process returned 0 (0x0)   execution time : 8.427 s
 Press any key to continue.
 ```
 
+TODO:
+
+1. Elliminate the Comparator Errors inside of the Intersector. Evidently my comparison events are not valid comparators and through errors that can be seen when compiled in debug mode.
+2. Fix comments.
+3. Modernize this README and chronicle all of the features, including perhaps the offset curves.
+4. Add set output types to various functions such as complemented face determination,
+   because for many users it will make more sense to output the list of indices as a set.
+5. Go and remove all of the int to size_t warnings with vector sizes to avoid errors in ridiculously large inputs.
+6. FIX Union meet at 1 point only bug, because the union of all of the neighbors of a landlocked face, but not the face itself will include it because the neighborhood will be improiperly traced.
+

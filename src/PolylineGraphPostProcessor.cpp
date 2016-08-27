@@ -95,7 +95,7 @@ namespace scrib
         return output;
     }
 
-    void PolylineGraphPostProcessor::determineExternalFaces(std::vector<int> * output)
+    void PolylineGraphPostProcessor::determineComplementedFaces(std::vector<int> * output)
     {
         Face_Vector_Format * input = face_vector;
 
@@ -411,11 +411,7 @@ namespace scrib
         // true iff Twin face not in the set of faces in the union.
         auto NOT_FOUND = face_ID_set -> end();
 
-        // Handle in Union Tail edges.
-        if (face_iter != NOT_FOUND && face_ID == twin_ID)
-        {
-            //return true;
-        }
+        // NOTE: Tail edges with the same Face on both sides are treated as not in the union,
 
         return face_iter != NOT_FOUND && twin_iter == NOT_FOUND;
     }
