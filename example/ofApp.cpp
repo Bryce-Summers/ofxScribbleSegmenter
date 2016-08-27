@@ -126,7 +126,7 @@ void ofApp::draw(){
 
     //drawPath(points_2);
 
-    drawMergeFaces();
+    drawMergeFaces(merge_faces, 6);
 
     ofDrawBitmapString("Press 'A' and 'D' to cycle left and right through the faces.", 20, 170);
     ofDrawBitmapString("Click and drag the mouse in a wild pattern, then release to test new scribbles!", 20, 200);
@@ -392,11 +392,15 @@ void ofApp::updateMergeFaces()
     merge_faces = post_processor.mergeFaces(&set);
 }
 
-void ofApp::drawMergeFaces()
+void ofApp::drawMergeFaces(std::vector<scrib::face_info *> * faces, int thickness)
 {
 
-    for (auto iter = merge_faces -> begin(); iter != merge_faces -> end(); iter++)
+    for (auto iter = faces -> begin(); iter != faces -> end(); iter++)
     {
-        drawPath(&((*iter) -> points), 128, 5, false);
+        scrib::face_info * face = *iter;
+
+        drawPath(&(face -> points), 128, thickness, false);
+        
+        drawMergeFaces(&(face->holes), 2);
     }
 }
