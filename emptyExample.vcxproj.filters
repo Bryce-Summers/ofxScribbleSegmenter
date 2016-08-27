@@ -42,6 +42,9 @@
     <ClCompile Include="src\PolylineGraphPostProcessor.cpp">
       <Filter>src\PolylineGraphs</Filter>
     </ClCompile>
+    <ClCompile Include="src\PolylineGraphData.cpp">
+      <Filter>src\PolylineGraphs</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="example\ofApp.h">
