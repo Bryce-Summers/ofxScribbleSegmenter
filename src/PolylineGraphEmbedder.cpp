@@ -37,7 +37,7 @@ namespace scrib {
 
     inline Graph * PolylineGraphEmbedder::trivial(std::vector<ofPoint> * inputs)
     {
-        graph = new Graph();
+        graph = newGraph();
 
         if (inputs->size() < 1)
         {

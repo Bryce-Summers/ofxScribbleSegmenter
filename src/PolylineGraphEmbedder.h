@@ -142,8 +142,8 @@ namespace scrib {
         void sort_outgoing_edges_by_angle();
 
         // Step 4 helper function.
-        // Sorts the outgoing_indies by the angles of the lines from the center
-        // point to the points cooresponding to the outgoing indices.
+        // Sorts the outgoing_edges by the angles of the lines from the center
+        //point to the points cooresponding to the outgoing edges.
         void sort_outgoing_edges(std::vector<Halfedge * > & outgoing_indices);
 
         // -- Step 5.
